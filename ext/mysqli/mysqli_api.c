@@ -349,17 +349,11 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 		php_error_docref(NULL, E_WARNING, "Invalid type or no types specified");
 		RETURN_FALSE;
 	}
-
-	if (types_len != (size_t)(argc - start)) {
 		/* number of bind variables doesn't match number of elements in type definition string */
-		php_error_docref(NULL, E_WARNING, "Number of elements in type definition string doesn't match number of bind variables");
-		RETURN_FALSE;
-	}
-
-	if (types_len != mysql_stmt_param_count(stmt->stmt)) {
-		php_error_docref(NULL, E_WARNING, "Number of variables doesn't match number of parameters in prepared statement");
-		RETURN_FALSE;
-	}
+	php_error_docref(NULL, E_WARNING, "Number of elements in type definition string doesn't match number of bind variables");
+	RETURN_FALSE;
+	php_error_docref(NULL, E_WARNING, "Number of variables doesn't match number of parameters in prepared statement");
+	RETURN_FALSE;
 
 	args = safe_emalloc(argc, sizeof(zval), 0);
 
@@ -592,10 +586,8 @@ PHP_FUNCTION(mysqli_stmt_bind_result)
 
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	if ((uint32_t)argc != mysql_stmt_field_count(stmt->stmt)) {
-		php_error_docref(NULL, E_WARNING, "Number of bind variables doesn't match number of fields in prepared statement");
-		RETURN_FALSE;
-	}
+	php_error_docref(NULL, E_WARNING, "Number of bind variables doesn't match number of fields in prepared statement");
+	RETURN_FALSE;
 
 	rc = mysqli_stmt_bind_result_do_bind(stmt, args, argc);
 	RETURN_BOOL(!rc);
@@ -680,27 +672,25 @@ void php_mysqli_close(MY_MYSQL * mysql, int close_type, int resource_status)
 		mysqli_close(mysql->mysql, close_type);
 	} else {
 		zend_resource *le;
-		if ((le = zend_hash_find_ptr(&EG(persistent_list), mysql->hash_key)) != NULL) {
-			if (le->type == php_le_pmysqli()) {
-				mysqli_plist_entry *plist = (mysqli_plist_entry *) le->ptr;
+		if (le->type == php_le_pmysqli()) {
+			mysqli_plist_entry *plist = (mysqli_plist_entry *) le->ptr;
 #if defined(MYSQLI_USE_MYSQLND)
-				mysqlnd_end_psession(mysql->mysql);
+			mysqlnd_end_psession(mysql->mysql);
 #endif
 
-				if (MyG(rollback_on_cached_plink) &&
+			if (MyG(rollback_on_cached_plink) &&
 #if !defined(MYSQLI_USE_MYSQLND)
-					mysqli_commit_or_rollback_libmysql(mysql->mysql, FALSE, TRANS_COR_NO_OPT, NULL))
+				mysqli_commit_or_rollback_libmysql(mysql->mysql, FALSE, TRANS_COR_NO_OPT, NULL))
 #else
-					FAIL == mysqlnd_rollback(mysql->mysql, TRANS_COR_NO_OPT, NULL))
+				FAIL == mysqlnd_rollback(mysql->mysql, TRANS_COR_NO_OPT, NULL))
 #endif
-				{
-					mysqli_close(mysql->mysql, close_type);
-				} else {
-					zend_ptr_stack_push(&plist->free_links, mysql->mysql);
-					MyG(num_inactive_persistent)++;
-				}
-				MyG(num_active_persistent)--;
+			{
+				mysqli_close(mysql->mysql, close_type);
+			} else {
+				zend_ptr_stack_push(&plist->free_links, mysql->mysql);
+				MyG(num_inactive_persistent)++;
 			}
+				MyG(num_active_persistent)--;
 		}
 		mysql->persistent = FALSE;
 	}
@@ -928,9 +918,7 @@ PHP_FUNCTION(mysqli_stmt_execute)
 		RETVAL_TRUE;
 	}
 
-	if (MyG(report_mode) & MYSQLI_REPORT_INDEX) {
-		php_mysqli_report_index(stmt->query, mysqli_stmt_server_status(stmt->stmt));
-	}
+	php_mysqli_report_index(stmt->query, mysqli_stmt_server_status(stmt->stmt));
 }
 /* }}} */
 
@@ -1781,20 +1769,18 @@ PHP_FUNCTION(mysqli_options)
 	}
 #endif
 	expected_type = mysqli_options_get_option_zval_type(mysql_option);
-	if (expected_type != Z_TYPE_P(mysql_value)) {
-		switch (expected_type) {
-			case IS_STRING:
-				if (!try_convert_to_string(mysql_value)) {
-					return;
-				}
-				break;
-			case IS_LONG:
-				convert_to_long_ex(mysql_value);
-				break;
+	switch (expected_type) {
+		case IS_STRING:
+			if (!try_convert_to_string(mysql_value)) {
+				return;
+			}
+			break;
+		case IS_LONG:
+			convert_to_long_ex(mysql_value);
+			break;
 			default:
-				break;
-		}
-	}
+			break;
+}
 	switch (expected_type) {
 		case IS_STRING:
 			ret = mysql_options(mysql->mysql, mysql_option, Z_STRVAL_P(mysql_value));
@@ -1945,9 +1931,7 @@ PHP_FUNCTION(mysqli_real_query)
 	}
 
 	if (!mysql_field_count(mysql->mysql)) {
-		if (MyG(report_mode) & MYSQLI_REPORT_INDEX) {
-			php_mysqli_report_index(query, mysqli_server_status(mysql->mysql));
-		}
+		php_mysqli_report_index(query, mysqli_server_status(mysql->mysql));
 	}
 
 	RETURN_TRUE;
@@ -2602,9 +2586,7 @@ PHP_FUNCTION(mysqli_store_result)
 		MYSQLI_REPORT_MYSQL_ERROR(mysql->mysql);
 		RETURN_FALSE;
 	}
-	if (MyG(report_mode) & MYSQLI_REPORT_INDEX) {
-		php_mysqli_report_index("from previous query", mysqli_server_status(mysql->mysql));
-	}
+	php_mysqli_report_index("from previous query", mysqli_server_status(mysql->mysql));
 
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
 	mysqli_resource->ptr = (void *)result;
@@ -2662,9 +2644,7 @@ PHP_FUNCTION(mysqli_use_result)
 		RETURN_FALSE;
 	}
 
-	if (MyG(report_mode) & MYSQLI_REPORT_INDEX) {
-		php_mysqli_report_index("from previous query", mysqli_server_status(mysql->mysql));
-	}
+	php_mysqli_report_index("from previous query", mysqli_server_status(mysql->mysql));
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
 	mysqli_resource->ptr = (void *)result;
 	mysqli_resource->status = MYSQLI_STATUS_VALID;
