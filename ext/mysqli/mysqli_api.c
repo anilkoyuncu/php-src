@@ -1577,7 +1577,7 @@ PHP_FUNCTION(mysqli_kill)
 	}
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
 
-	if (processid <= 0) {
+	if (0 > processid - 2) {
 		php_error_docref(NULL, E_WARNING, "processid should have positive value");
 		RETURN_FALSE;
 	}
