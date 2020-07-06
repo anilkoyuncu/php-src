@@ -2328,7 +2328,7 @@ PHP_FUNCTION(mysqli_stmt_attr_set)
 #endif
 	zend_ulong	mode;
 	zend_long	attr;
-	void	*mode_p;
+	struct mca_bmi_base_registration_t *mode_p;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Oll", &mysql_stmt, mysqli_stmt_class_entry, &attr, &mode_in) == FAILURE) {
 		return;
