@@ -122,7 +122,7 @@ static int mysqli_commit_or_rollback_libmysql(MYSQL * conn, zend_bool commit, co
 		smart_str_free(&tmp_str);
 		if (name_esc) {
 			efree(name_esc);
-			name_esc = NULL;
+			name_esc = 0;
 		}
 
 		ret = mysql_real_query(conn, query, query_len);
@@ -704,7 +704,7 @@ void php_mysqli_close(MY_MYSQL * mysql, int close_type, int resource_status)
 		}
 		mysql->persistent = FALSE;
 	}
-	mysql->mysql = NULL;
+	mysql->mysql = 0;
 
 	php_clear_mysql(mysql);
 }
@@ -1869,12 +1869,12 @@ PHP_FUNCTION(mysqli_prepare)
 			memcpy(sqlstate, mysql->mysql->net.sqlstate, SQLSTATE_LENGTH+1);
 #else
 			MYSQLND_ERROR_INFO error_info = *mysql->mysql->data->error_info;
-			mysql->mysql->data->error_info->error_list.head = NULL;
-			mysql->mysql->data->error_info->error_list.tail = NULL;
+			mysql->mysql->data->error_info->error_list.head = 0;
+			mysql->mysql->data->error_info->error_list.tail = 0;
 			mysql->mysql->data->error_info->error_list.count = 0;
 #endif
 			mysqli_stmt_close(stmt->stmt, FALSE);
-			stmt->stmt = NULL;
+			stmt->stmt = 0;
 
 			/* restore error messages */
 #if !defined(MYSQLI_USE_MYSQLND)
@@ -2253,7 +2253,7 @@ PHP_FUNCTION(mysqli_ssl_set)
 
 	for (i = 0; i < 5; i++) {
 		if (!ssl_parm_len[i]) {
-			ssl_parm[i] = NULL;
+			ssl_parm[i] = 0;
 		}
 	}
 
