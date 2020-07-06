@@ -73,9 +73,12 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 		const char * p_orig = name;
 		char * p_copy;
 		p_copy = ret = emalloc(strlen(name) + 1 + 2 + 2 + 1); /* space, open, close, NullS */
-		*p_copy++ = ' ';
-		*p_copy++ = '/';
-		*p_copy++ = '*';
+		*p_copy = ' ';
+		p_copy++;
+		*p_copy = '/';
+		p_copy++;
+		*p_copy = '*';
+		p_copy++;
 		while (1) {
 			register char v = *p_orig;
 			if (v == 0) {
@@ -89,16 +92,20 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 				v == ' ' ||
 				v == '=')
 			{
-				*p_copy++ = v;
+				*p_copy = v;
+				p_copy++;
 			} else if (warned == FALSE) {
 				php_error_docref(NULL, E_WARNING, "Transaction name truncated. Must be only [0-9A-Za-z\\-_=]+");
 				warned = TRUE;
 			}
 			++p_orig;
 		}
-		*p_copy++ = '*';
-		*p_copy++ = '/';
-		*p_copy++ = 0;
+		*p_copy = '*';
+		p_copy++;
+		*p_copy = '/';
+		p_copy++;
+		*p_copy = 0;
+		p_copy++;
 	}
 	return ret;
 }
