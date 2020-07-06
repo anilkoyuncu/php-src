@@ -655,7 +655,7 @@ PHP_FUNCTION(mysqli_character_set_name)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	const char	*cs_name;
+	char *cs_name;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -839,7 +839,7 @@ PHP_FUNCTION(mysqli_error)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	const char	*err;
+	char *err;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1439,7 +1439,7 @@ PHP_FUNCTION(mysqli_get_server_info)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link = NULL;
-	const char	*info;
+	char *info;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1475,7 +1475,7 @@ PHP_FUNCTION(mysqli_info)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link = NULL;
-	const char	*info;
+	char *info;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -2224,7 +2224,7 @@ PHP_FUNCTION(mysqli_sqlstate)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	const char	*state;
+	char *state;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -2412,7 +2412,7 @@ PHP_FUNCTION(mysqli_stmt_error)
 {
 	MY_STMT	*stmt;
 	zval 	*mysql_stmt;
-	const char * err;
+	char *err;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_stmt, mysqli_stmt_class_entry) == FAILURE) {
 		return;
@@ -2564,7 +2564,7 @@ PHP_FUNCTION(mysqli_stmt_sqlstate)
 {
 	MY_STMT	*stmt;
 	zval	*mysql_stmt;
-	const char * state;
+	char *state;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_stmt, mysqli_stmt_class_entry) == FAILURE) {
 		return;
