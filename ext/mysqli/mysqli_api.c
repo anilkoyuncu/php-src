@@ -232,7 +232,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 
 			default:
 				php_error_docref(NULL, E_WARNING, "Undefined fieldtype %c (parameter %d)", types[ofs], i+1);
-				rc = 1;
+				rc = true;
 				goto end_1;
 		}
 		ofs++;
@@ -340,7 +340,7 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 
 	num_vars = argc - 1;
 	if (getThis()) {
-		start = 1;
+		start = true;
 	} else {
 		/* ignore handle parameter in procedural interface*/
 		--num_vars;
@@ -365,7 +365,7 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 
 	if (zend_get_parameters_array_ex(argc, args) == FAILURE) {
 		zend_wrong_param_count();
-		rc = 1;
+		rc = true;
 	} else {
 		rc = mysqli_stmt_bind_param_do_bind(stmt, argc, num_vars, args, start, types);
 		MYSQLI_REPORT_STMT_ERROR(stmt->stmt);
@@ -1804,7 +1804,7 @@ PHP_FUNCTION(mysqli_options)
 			ret = mysql_options(mysql->mysql, mysql_option, (char *)&l_value);
 			break;
 		default:
-			ret = 1;
+			ret = true;
 			break;
 	}
 
