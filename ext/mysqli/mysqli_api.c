@@ -70,7 +70,7 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 	char * ret = NULL;
 	if (name) {
 		zend_bool warned = FALSE;
-		const char * p_orig = name;
+		const char *p_orig = (char *)name;
 		char * p_copy;
 		p_copy = ret = emalloc(strlen(name) + 1 + 2 + 2 + 1); /* space, open, close, NullS */
 		*p_copy++ = ' ';
@@ -1217,7 +1217,8 @@ PHP_FUNCTION(mysqli_fetch_fields)
 	num_fields = mysql_num_fields(result);
 
 	for (i = 0; i < num_fields; i++) {
-		const MYSQL_FIELD *field = mysql_fetch_field_direct(result, i);
+		const MYSQL_FIELD *field = (MYSQL_FIELD *)mysql_fetch_field_direct(result,
+										   i);
 
 		object_init(&obj);
 
@@ -1380,7 +1381,7 @@ PHP_FUNCTION(mysqli_get_client_info)
 		return;
 	}
 
-	const char * info = mysql_get_client_info();
+	const char *info = (char *)mysql_get_client_info();
 	if (info) {
 		RETURN_STRING(info);
 	}
