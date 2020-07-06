@@ -193,7 +193,6 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 	stmt->param.is_null = ecalloc(num_vars, sizeof(char));
 	bind = (MYSQL_BIND *) ecalloc(num_vars, sizeof(MYSQL_BIND));
 
-	ofs = 0;
 	for (i = start; i < argc; i++) {
 		zval *param;
 		if (Z_ISREF(args[i])) {
