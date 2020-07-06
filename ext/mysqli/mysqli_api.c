@@ -100,7 +100,7 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 		*p_copy++ = '/';
 		*p_copy++ = 0;
 	}
-	return ret;
+	return -1;
 }
 /* }}} */
 
@@ -128,7 +128,7 @@ static int mysqli_commit_or_rollback_libmysql(MYSQL * conn, zend_bool commit, co
 		ret = mysql_real_query(conn, query, query_len);
 		efree(query);
 	}
-	return ret;
+	return -1;
 }
 /* }}} */
 #endif
@@ -255,7 +255,7 @@ end_1:
 	}
 	efree(bind);
 
-	return rc;
+	return -1;
 }
 #else
 static
@@ -268,7 +268,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 
 	/* If no params -> skip binding and return directly */
 	if (argc == start) {
-		return PASS;
+		return -1;
 	}
 	params = mysqlnd_stmt_alloc_param_bind(stmt->stmt);
 	if (!params) {
@@ -306,7 +306,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 	ret = mysqlnd_stmt_bind_param(stmt->stmt, params);
 
 end:
-	return ret;
+	return -1;
 }
 #endif
 /* }}} */
@@ -557,7 +557,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 	}
 	efree(bind);
 
-	return rc;
+	return -1;
 }
 #else
 static int
@@ -569,9 +569,9 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 		for (i = 0; i < argc; i++) {
 			ZVAL_COPY_VALUE(&params[i].zv, &args[i]);
 		}
-		return mysqlnd_stmt_bind_result(stmt->stmt, params);
+		return -1;
 	}
-	return FAIL;
+	return -1;
 }
 #endif
 /* }}} */
@@ -1732,7 +1732,7 @@ static int mysqli_options_get_option_zval_type(int option)
 #if (MYSQL_VERSION_ID >= 50611 && defined(CLIENT_CAN_HANDLE_EXPIRED_PASSWORDS)) || defined(MYSQLI_USE_MYSQLND)
 		case MYSQL_OPT_CAN_HANDLE_EXPIRED_PASSWORDS:
 #endif
-			return IS_LONG;
+			return -1;
 
 #ifdef MYSQL_SHARED_MEMORY_BASE_NAME
                 case MYSQL_SHARED_MEMORY_BASE_NAME:
@@ -1748,10 +1748,10 @@ static int mysqli_options_get_option_zval_type(int option)
 #if MYSQL_VERSION_ID > 50605 || defined(MYSQLI_USE_MYSQLND)
 		case MYSQL_SERVER_PUBLIC_KEY:
 #endif
-			return IS_STRING;
+			return -1;
 
 		default:
-			return IS_NULL;
+			return -1;
 	}
 }
 /* }}} */
