@@ -664,7 +664,8 @@ PHP_FUNCTION(mysqli_character_set_name)
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
 	cs_name = mysql_character_set_name(mysql->mysql);
 	if (cs_name) {
-		RETURN_STRING(cs_name);
+		RETVAL_STRING(cs_name);
+		efree(cs_name);
 	}
 }
 /* }}} */
@@ -847,7 +848,8 @@ PHP_FUNCTION(mysqli_error)
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
 	err = mysql_error(mysql->mysql);
 	if (err) {
-		RETURN_STRING(err);
+		RETVAL_STRING(err);
+		efree(err);
 	}
 }
 /* }}} */
@@ -1382,7 +1384,8 @@ PHP_FUNCTION(mysqli_get_client_info)
 
 	const char * info = mysql_get_client_info();
 	if (info) {
-		RETURN_STRING(info);
+		RETVAL_STRING(info);
+		efree(info);
 	}
 }
 /* }}} */
@@ -1411,9 +1414,11 @@ PHP_FUNCTION(mysqli_get_host_info)
 	}
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
 #if !defined(MYSQLI_USE_MYSQLND)
-	RETURN_STRING((mysql->mysql->host_info) ? mysql->mysql->host_info : "");
+	RETVAL_STRING((mysql->mysql->host_info) ? mysql->mysql->host_info : "");
+	efree((mysql->mysql->host_info) ? mysql->mysql->host_info : "");
 #else
-	RETURN_STRING((mysql->mysql->data->host_info) ? mysql->mysql->data->host_info : "");
+	RETVAL_STRING((mysql->mysql->data->host_info) ? mysql->mysql->data->host_info : "");
+	efree((mysql->mysql->data->host_info) ? mysql->mysql->data->host_info : "");
 #endif
 }
 /* }}} */
@@ -1448,7 +1453,8 @@ PHP_FUNCTION(mysqli_get_server_info)
 
 	info = mysql_get_server_info(mysql->mysql);
 	if (info) {
-		RETURN_STRING(info);
+		RETVAL_STRING(info);
+		efree(info);
 	}
 }
 /* }}} */
@@ -1484,7 +1490,8 @@ PHP_FUNCTION(mysqli_info)
 
 	info = mysql_info(mysql->mysql);
 	if (info) {
-		RETURN_STRING(info);
+		RETVAL_STRING(info);
+		efree(info);
 	}
 }
 /* }}} */
@@ -2232,7 +2239,8 @@ PHP_FUNCTION(mysqli_sqlstate)
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
 	state = mysql_sqlstate(mysql->mysql);
 	if (state) {
-		RETURN_STRING(state);
+		RETVAL_STRING(state);
+		efree(state);
 	}
 }
 /* }}} */
@@ -2283,7 +2291,8 @@ PHP_FUNCTION(mysqli_stat)
 #if !defined(MYSQLI_USE_MYSQLND)
 	if ((stat = (char *)mysql_stat(mysql->mysql)))
 	{
-		RETURN_STRING(stat);
+		RETVAL_STRING(stat);
+		efree(stat);
 #else
 	if (mysqlnd_stat(mysql->mysql, &stat) == PASS)
 	{
@@ -2421,7 +2430,8 @@ PHP_FUNCTION(mysqli_stmt_error)
 
 	err = mysql_stmt_error(stmt->stmt);
 	if (err) {
-		RETURN_STRING(err);
+		RETVAL_STRING(err);
+		efree(err);
 	}
 }
 /* }}} */
@@ -2573,7 +2583,8 @@ PHP_FUNCTION(mysqli_stmt_sqlstate)
 
 	state = mysql_stmt_sqlstate(stmt->stmt);
 	if (state) {
-		RETURN_STRING(state);
+		RETVAL_STRING(state);
+		efree(state);
 	}
 }
 /* }}} */
