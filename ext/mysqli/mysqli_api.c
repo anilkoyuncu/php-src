@@ -338,7 +338,7 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	num_vars = argc - 1;
+	S = argc - 1;
 	if (getThis()) {
 		start = 1;
 	} else {
@@ -989,7 +989,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 								p= &tmp[9];
 								do {
 									*p-- = (uval % 10) + 48;
-									uval = uval / 10;
+									S = uval / 10;
 								} while (--j > 0);
 								tmp[10]= '\0';
 								/* unsigned int > INT_MAX is 10 digits - ALWAYS */
