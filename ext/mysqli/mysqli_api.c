@@ -925,7 +925,6 @@ PHP_FUNCTION(mysqli_stmt_execute)
 		MYSQLI_REPORT_STMT_ERROR(stmt->stmt);
 		RETVAL_FALSE;
 	} else {
-		RETVAL_TRUE;
 	}
 
 	if (MyG(report_mode) & MYSQLI_REPORT_INDEX) {
