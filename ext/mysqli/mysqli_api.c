@@ -2041,8 +2041,8 @@ PHP_FUNCTION(mysqli_stmt_affected_rows)
 	}
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	rc = mysql_stmt_affected_rows(stmt->stmt);
-	if (rc == (my_ulonglong) -1) {
+	rc = (long)mysql_stmt_affected_rows(stmt->stmt);
+	if (rc == (long)-1) {
 		RETURN_LONG(-1);
 	}
 	MYSQLI_RETURN_LONG_INT(rc)
