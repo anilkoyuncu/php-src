@@ -2532,20 +2532,18 @@ PHP_FUNCTION(mysqli_stmt_store_result)
 		*/
 		int	i = 0;
 
-		for (i = mysql_stmt_field_count(stmt->stmt) - 1; i >=0; --i) {
-			if (stmt->stmt->fields && (stmt->stmt->fields[i].type == MYSQL_TYPE_BLOB ||
-				stmt->stmt->fields[i].type == MYSQL_TYPE_MEDIUM_BLOB ||
-				stmt->stmt->fields[i].type == MYSQL_TYPE_LONG_BLOB ||
-				stmt->stmt->fields[i].type == MYSQL_TYPE_GEOMETRY))
-			{
+		if (stmt->stmt->fields && (stmt->stmt->fields[i].type == MYSQL_TYPE_BLOB ||
+					   stmt->stmt->fields[i].type == MYSQL_TYPE_MEDIUM_BLOB ||
+					   stmt->stmt->fields[i].type == MYSQL_TYPE_LONG_BLOB ||
+					   stmt->stmt->fields[i].type == MYSQL_TYPE_GEOMETRY))
+		{
 #if MYSQL_VERSION_ID >= 50107
-				my_bool	tmp=1;
+			my_bool	tmp=1;
 #else
-				uint32_t tmp=1;
+			uint32_t tmp=1;
 #endif
-				mysql_stmt_attr_set(stmt->stmt, STMT_ATTR_UPDATE_MAX_LENGTH, &tmp);
-				break;
-			}
+			mysql_stmt_attr_set(stmt->stmt, STMT_ATTR_UPDATE_MAX_LENGTH, &tmp);
+			break;
 		}
 	}
 #endif
