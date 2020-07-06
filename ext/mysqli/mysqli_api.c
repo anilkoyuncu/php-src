@@ -414,7 +414,8 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				stmt->result.buf[ofs].type = IS_DOUBLE;
 				stmt->result.buf[ofs].buflen = sizeof(float);
 
-				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(float));
+				stmt->result.buf[ofs].val = (char *)ecalloc(1,
+									    sizeof(float));
 				bind[ofs].buffer_type = MYSQL_TYPE_FLOAT;
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
@@ -425,7 +426,8 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				stmt->result.buf[ofs].buflen = sizeof(double);
 
 				/* allocate buffer for double */
-				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(double));
+				stmt->result.buf[ofs].val = (char *)ecalloc(1,
+									    sizeof(double));
 				bind[ofs].buffer_type = MYSQL_TYPE_DOUBLE;
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
@@ -451,7 +453,8 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 			case MYSQL_TYPE_YEAR:
 				stmt->result.buf[ofs].type = IS_LONG;
 				/* don't set stmt->result.buf[ofs].buflen to 0, we used ecalloc */
-				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(int));
+				stmt->result.buf[ofs].val = (char *)ecalloc(1,
+									    sizeof(int));
 				bind[ofs].buffer_type = MYSQL_TYPE_LONG;
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
@@ -464,7 +467,8 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 #endif
 				stmt->result.buf[ofs].type = IS_STRING;
 				stmt->result.buf[ofs].buflen = sizeof(my_ulonglong);
-				stmt->result.buf[ofs].val = (char *)emalloc(stmt->result.buf[ofs].buflen);
+				stmt->result.buf[ofs].val = (char *)ecalloc(1,
+									    stmt->result.buf[ofs].buflen);
 				bind[ofs].buffer_type = col_type;
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
@@ -522,7 +526,8 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 					if (!(stmt->result.buf[ofs].buflen = stmt->stmt->fields[ofs].max_length))
 						++stmt->result.buf[ofs].buflen;
 				}
-				stmt->result.buf[ofs].val = (char *)emalloc(stmt->result.buf[ofs].buflen);
+				stmt->result.buf[ofs].val = (char *)ecalloc(1,
+									    stmt->result.buf[ofs].buflen);
 				bind[ofs].buffer_type = MYSQL_TYPE_STRING;
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
@@ -1891,7 +1896,7 @@ PHP_FUNCTION(mysqli_prepare)
 	/* don't initialize stmt->query with NULL, we ecalloc()-ed the memory */
 	/* Get performance boost if reporting is switched off */
 	if (stmt->stmt && query_len && (MyG(report_mode) & MYSQLI_REPORT_INDEX)) {
-		stmt->query = (char *)emalloc(query_len + 1);
+		stmt->query = (char *)ecalloc(1, query_len + 1);
 		memcpy(stmt->query, query, query_len);
 		stmt->query[query_len] = '\0';
 	}
