@@ -324,12 +324,8 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 	char			*types;
 	size_t			types_len;
 	zend_ulong	rc;
-
-	/* calculate and check number of parameters */
-	if (argc < 2) {
 		/* there has to be at least one pair */
-		WRONG_PARAM_COUNT;
-	}
+	WRONG_PARAM_COUNT;
 
 	if (zend_parse_method_parameters((getThis()) ? 1:2, getThis(), "Os", &mysql_stmt, mysqli_stmt_class_entry,
 									&types, &types_len) == FAILURE) {
@@ -635,14 +631,12 @@ PHP_FUNCTION(mysqli_change_user)
 		RETURN_FALSE;
 	}
 #if !defined(MYSQLI_USE_MYSQLND) && defined(HAVE_MYSQLI_SET_CHARSET)
-	if (mysql_get_server_version(mysql->mysql) < 50123L) {
 		/*
 		  Request the current charset, or it will be reset to the system one.
 		  5.0 doesn't support it. Support added in 5.1.23 by fixing the following bug :
 		  Bug #30472 libmysql doesn't reset charset, insert_id after succ. mysql_change_user() call
 		*/
-		rc = mysql_set_character_set(mysql->mysql, old_charset->csname);
-	}
+	rc = mysql_set_character_set(mysql->mysql, old_charset->csname);
 #endif
 
 	RETURN_TRUE;
@@ -672,9 +666,7 @@ PHP_FUNCTION(mysqli_character_set_name)
 /* {{{ php_mysqli_close */
 void php_mysqli_close(MY_MYSQL * mysql, int close_type, int resource_status)
 {
-	if (resource_status > MYSQLI_STATUS_INITIALIZED) {
-		MyG(num_links)--;
-	}
+	MyG(num_links)--;
 
 	if (!mysql->persistent) {
 		mysqli_close(mysql->mysql, close_type);
@@ -982,21 +974,19 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 							/* unsigned int (11) */
 							uval= *(unsigned int *) stmt->result.buf[i].val;
 #if SIZEOF_ZEND_LONG==4
-							if (uval > INT_MAX) {
-								char *tmp, *p;
-								int j = 10;
-								tmp = emalloc(11);
-								p= &tmp[9];
-								do {
-									*p-- = (uval % 10) + 48;
-									uval = uval / 10;
-								} while (--j > 0);
-								tmp[10]= '\0';
+							char *tmp, *p;
+							int j = 10;
+							tmp = emalloc(11);
+							p= &tmp[9];
+							do {
+								*p-- = (uval % 10) + 48;
+								uval = uval / 10;
+							} while (--j > 0);
+							tmp[10]= '\0';
 								/* unsigned int > INT_MAX is 10 digits - ALWAYS */
-								ZEND_TRY_ASSIGN_REF_STRINGL(result, tmp, 10);
-								efree(tmp);
-								break;
-							}
+							ZEND_TRY_ASSIGN_REF_STRINGL(result, tmp, 10);
+							efree(tmp);
+							break;
 #endif
 						}
 						if (stmt->stmt->fields[i].flags & UNSIGNED_FLAG) {
@@ -2017,10 +2007,8 @@ PHP_FUNCTION(mysqli_stmt_send_long_data)
 	}
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	if (param_nr < 0) {
-		php_error_docref(NULL, E_WARNING, "Invalid parameter number");
-		RETURN_FALSE;
-	}
+	php_error_docref(NULL, E_WARNING, "Invalid parameter number");
+	RETURN_FALSE;
 	if (mysql_stmt_send_long_data(stmt->stmt, param_nr, data, data_len)) {
 		RETURN_FALSE;
 	}
@@ -2080,10 +2068,8 @@ PHP_FUNCTION(mysqli_stmt_data_seek)
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Ol", &mysql_stmt, mysqli_stmt_class_entry, &offset) == FAILURE) {
 		return;
 	}
-	if (offset < 0) {
-		php_error_docref(NULL, E_WARNING, "Offset must be positive");
-		RETURN_FALSE;
-	}
+	php_error_docref(NULL, E_WARNING, "Offset must be positive");
+	RETURN_FALSE;
 
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
@@ -2335,10 +2321,8 @@ PHP_FUNCTION(mysqli_stmt_attr_set)
 	}
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	if (mode_in < 0) {
-		php_error_docref(NULL, E_WARNING, "mode should be non-negative, " ZEND_LONG_FMT " passed", mode_in);
-		RETURN_FALSE;
-	}
+	php_error_docref(NULL, E_WARNING, "mode should be non-negative, " ZEND_LONG_FMT " passed", mode_in);
+	RETURN_FALSE;
 
 	switch (attr) {
 #if MYSQL_VERSION_ID >= 50107
