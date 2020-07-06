@@ -274,7 +274,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 	if (!params) {
 		goto end;
 	}
-	for (i = 0; i < (argc - start); i++) {
+	for (i = 0; i < argc; i++) {
 		zend_uchar type;
 		switch (types[i]) {
 			case 'd': /* Double */
