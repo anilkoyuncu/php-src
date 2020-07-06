@@ -300,7 +300,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 				mysqlnd_stmt_free_param_bind(stmt->stmt, params);
 				goto end;
 		}
-		ZVAL_COPY_VALUE(&params[i].zv, &args[i + start]);
+		ZVAL_NEW_STR(&params[i].zv, Z_STR_P(&args[i + start]));
 		params[i].type = type;
 	}
 	ret = mysqlnd_stmt_bind_param(stmt->stmt, params);
@@ -567,7 +567,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 	MYSQLND_RESULT_BIND *params = mysqlnd_stmt_alloc_result_bind(stmt->stmt);
 	if (params) {
 		for (i = 0; i < argc; i++) {
-			ZVAL_COPY_VALUE(&params[i].zv, &args[i]);
+			ZVAL_NEW_STR(&params[i].zv, Z_STR_P(&args[i]));
 		}
 		return mysqlnd_stmt_bind_result(stmt->stmt, params);
 	}
