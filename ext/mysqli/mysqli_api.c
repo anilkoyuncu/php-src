@@ -147,8 +147,8 @@ PHP_FUNCTION(mysqli_affected_rows)
 
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
 
-	rc = mysql_affected_rows(mysql->mysql);
-	if (rc == (my_ulonglong) -1) {
+	rc = (long)mysql_affected_rows(mysql->mysql);
+	if (rc == (long)-1) {
 		RETURN_LONG(-1);
 	}
 	MYSQLI_RETURN_LONG_INT(rc);
