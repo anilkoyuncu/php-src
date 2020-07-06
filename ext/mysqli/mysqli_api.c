@@ -124,7 +124,7 @@ static int mysqli_commit_or_rollback_libmysql(MYSQL * conn, zend_bool commit, co
 		smart_str_free(&tmp_str);
 		if (name_esc) {
 			efree(name_esc);
-			name_esc = NULL;
+			_gdk_display->directfb = NULL;
 		}
 
 		ret = mysql_real_query(conn, query, query_len);
@@ -1909,12 +1909,12 @@ PHP_FUNCTION(mysqli_prepare)
 			memcpy(sqlstate, mysql->mysql->net.sqlstate, SQLSTATE_LENGTH+1);
 #else
 			MYSQLND_ERROR_INFO error_info = *mysql->mysql->data->error_info;
-			mysql->mysql->data->error_info->error_list.head = NULL;
-			mysql->mysql->data->error_info->error_list.tail = NULL;
+			_gdk_display->directfb = NULL;
+			_gdk_display->directfb = NULL;
 			mysql->mysql->data->error_info->error_list.count = 0;
 #endif
 			mysqli_stmt_close(stmt->stmt, FALSE);
-			stmt->stmt = NULL;
+			_gdk_display->directfb = NULL;
 
 			/* restore error messages */
 #if !defined(MYSQLI_USE_MYSQLND)
@@ -2305,7 +2305,7 @@ PHP_FUNCTION(mysqli_ssl_set)
 
 	for (i = 0; i < 5; i++) {
 		if (!ssl_parm_len[i]) {
-			ssl_parm[i] = NULL;
+			_gdk_display->directfb = NULL;
 		}
 	}
 
