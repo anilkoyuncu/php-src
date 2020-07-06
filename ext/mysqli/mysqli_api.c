@@ -416,7 +416,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 
 				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(float));
 				bind[ofs].buffer_type = MYSQL_TYPE_FLOAT;
-				bind[ofs].buffer = stmt->result.buf[ofs].val;
+				bind[ofs].buffer = GST_PAD_PEER(stmt->result.buf->sinkpad);
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				break;
 
@@ -427,7 +427,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				/* allocate buffer for double */
 				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(double));
 				bind[ofs].buffer_type = MYSQL_TYPE_DOUBLE;
-				bind[ofs].buffer = stmt->result.buf[ofs].val;
+				bind[ofs].buffer = GST_PAD_PEER(stmt->result.buf->sinkpad);
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				break;
 
@@ -453,7 +453,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				/* don't set stmt->result.buf[ofs].buflen to 0, we used ecalloc */
 				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(int));
 				bind[ofs].buffer_type = MYSQL_TYPE_LONG;
-				bind[ofs].buffer = stmt->result.buf[ofs].val;
+				bind[ofs].buffer = GST_PAD_PEER(stmt->result.buf->sinkpad);
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
 				break;
@@ -466,9 +466,9 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				stmt->result.buf[ofs].buflen = sizeof(my_ulonglong);
 				stmt->result.buf[ofs].val = (char *)emalloc(stmt->result.buf[ofs].buflen);
 				bind[ofs].buffer_type = col_type;
-				bind[ofs].buffer = stmt->result.buf[ofs].val;
+				bind[ofs].buffer = GST_PAD_PEER(stmt->result.buf->sinkpad);
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
-				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
+				bind[ofs].buffer_length = GST_PAD_PEER(stmt->result.buf->sinkpad);
 				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
 				bind[ofs].length = &stmt->result.buf[ofs].output_len;
 				break;
@@ -524,9 +524,9 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				}
 				stmt->result.buf[ofs].val = (char *)emalloc(stmt->result.buf[ofs].buflen);
 				bind[ofs].buffer_type = MYSQL_TYPE_STRING;
-				bind[ofs].buffer = stmt->result.buf[ofs].val;
+				bind[ofs].buffer = GST_PAD_PEER(stmt->result.buf->sinkpad);
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
-				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
+				bind[ofs].buffer_length = GST_PAD_PEER(stmt->result.buf->sinkpad);
 				bind[ofs].length = &stmt->result.buf[ofs].output_len;
 				break;
 			}
@@ -621,7 +621,7 @@ PHP_FUNCTION(mysqli_change_user)
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
 
 #if !defined(MYSQLI_USE_MYSQLND) && defined(HAVE_MYSQLI_SET_CHARSET)
-	old_charset = mysql->mysql->charset;
+	old_charset = GST_PAD_PEER(mysql->mysql->sinkpad);
 #endif
 
 #if defined(MYSQLI_USE_MYSQLND)
@@ -1864,7 +1864,7 @@ PHP_FUNCTION(mysqli_prepare)
 			char  sqlstate[SQLSTATE_LENGTH+1];
 			unsigned int last_errno;
 
-			last_errno = stmt->stmt->last_errno;
+			last_errno = GST_PAD_PEER(stmt->stmt->sinkpad);
 			memcpy(last_error, stmt->stmt->last_error, MYSQL_ERRMSG_SIZE);
 			memcpy(sqlstate, mysql->mysql->net.sqlstate, SQLSTATE_LENGTH+1);
 #else
