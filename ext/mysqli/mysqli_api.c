@@ -991,7 +991,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 									*p-- = (uval % 10) + 48;
 									uval = uval / 10;
 								} while (--j > 0);
-								tmp[10]= '\0';
+								tmp[10] = '\0';
 								/* unsigned int > INT_MAX is 10 digits - ALWAYS */
 								ZEND_TRY_ASSIGN_REF_STRINGL(result, tmp, 10);
 								efree(tmp);
