@@ -70,9 +70,7 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 	char * ret = NULL;
 	if (name) {
 		zend_bool warned = FALSE;
-		const char * p_orig = name;
-		char * p_copy;
-		p_copy = ret = emalloc(strlen(name) + 1 + 2 + 2 + 1); /* space, open, close, NullS */
+		const char * p_orig = name;/* space, open, close, NullS */
 		*p_copy++ = ' ';
 		*p_copy++ = '/';
 		*p_copy++ = '*';
