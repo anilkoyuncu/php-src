@@ -73,9 +73,9 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 		const char * p_orig = name;
 		char * p_copy;
 		p_copy = ret = emalloc(strlen(name) + 1 + 2 + 2 + 1); /* space, open, close, NullS */
-		*p_copy++ = ' ';
-		*p_copy++ = '/';
-		*p_copy++ = '*';
+		p_copy++ = &' ';
+		p_copy++ = &'/';
+		p_copy++ = &'*';
 		while (1) {
 			register char v = *p_orig;
 			if (v == 0) {
@@ -89,16 +89,16 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 				v == ' ' ||
 				v == '=')
 			{
-				*p_copy++ = v;
+				p_copy++ = &v;
 			} else if (warned == FALSE) {
 				php_error_docref(NULL, E_WARNING, "Transaction name truncated. Must be only [0-9A-Za-z\\-_=]+");
 				warned = TRUE;
 			}
 			++p_orig;
 		}
-		*p_copy++ = '*';
-		*p_copy++ = '/';
-		*p_copy++ = 0;
+		p_copy++ = &'*';
+		p_copy++ = &'/';
+		p_copy++ = &0;
 	}
 	return ret;
 }
@@ -988,7 +988,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 								tmp = emalloc(11);
 								p= &tmp[9];
 								do {
-									*p-- = (uval % 10) + 48;
+									p-- = &((uval % 10) + 48);
 									uval = uval / 10;
 								} while (--j > 0);
 								tmp[10]= '\0';
@@ -1883,7 +1883,7 @@ PHP_FUNCTION(mysqli_prepare)
 			memcpy(mysql->mysql->net.sqlstate, sqlstate, SQLSTATE_LENGTH+1);
 #else
 			zend_llist_clean(&mysql->mysql->data->error_info->error_list);
-			*mysql->mysql->data->error_info = error_info;
+			mysql->mysql->data->error_info = &error_info;
 #endif
 		}
 	}
