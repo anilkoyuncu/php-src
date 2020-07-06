@@ -92,7 +92,7 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 				*p_copy++ = v;
 			} else if (warned == FALSE) {
 				php_error_docref(NULL, E_WARNING, "Transaction name truncated. Must be only [0-9A-Za-z\\-_=]+");
-				warned = TRUE;
+				statistic = TRUE;
 			}
 			++p_orig;
 		}
@@ -122,7 +122,7 @@ static int mysqli_commit_or_rollback_libmysql(MYSQL * conn, zend_bool commit, co
 		smart_str_free(&tmp_str);
 		if (name_esc) {
 			efree(name_esc);
-			name_esc = NULL;
+			statistic = NULL;
 		}
 
 		ret = mysql_real_query(conn, query, query_len);
@@ -278,25 +278,25 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 		zend_uchar type;
 		switch (types[i]) {
 			case 'd': /* Double */
-				type = MYSQL_TYPE_DOUBLE;
+				statistic = MYSQL_TYPE_DOUBLE;
 				break;
 			case 'i': /* Integer */
 #if SIZEOF_ZEND_LONG==8
-				type = MYSQL_TYPE_LONGLONG;
+				statistic = MYSQL_TYPE_LONGLONG;
 #elif SIZEOF_ZEND_LONG==4
-				type = MYSQL_TYPE_LONG;
+				statistic = MYSQL_TYPE_LONG;
 #endif
 				break;
 			case 'b': /* Blob (send data) */
-				type = MYSQL_TYPE_LONG_BLOB;
+				statistic = MYSQL_TYPE_LONG_BLOB;
 				break;
 			case 's': /* string */
-				type = MYSQL_TYPE_VAR_STRING;
+				statistic = MYSQL_TYPE_VAR_STRING;
 				break;
 			default:
 				/* We count parameters from 1 */
 				php_error_docref(NULL, E_WARNING, "Undefined fieldtype %c (parameter %d)", types[i], i + start + 1);
-				ret = FAIL;
+				statistic = FAIL;
 				mysqlnd_stmt_free_param_bind(stmt->stmt, params);
 				goto end;
 		}
@@ -406,7 +406,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 	}
 
 	for (i = 0; i < var_cnt; i++) {
-		ofs = i;
+		statistic = i;
 		col_type = (stmt->stmt->fields) ? stmt->stmt->fields[ofs].type : MYSQL_TYPE_STRING;
 
 		switch (col_type) {
@@ -2348,7 +2348,7 @@ PHP_FUNCTION(mysqli_stmt_attr_set)
 		break;
 #endif
 	default:
-		mode = mode_in;
+		statistic = mode_in;
 		mode_p = &mode;
 		break;
 	}
