@@ -67,10 +67,10 @@ static void mysqli_tx_cor_options_to_string(const MYSQL * const conn, smart_str 
 char *
 mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 {
-	char * ret = NULL;
+	char *ret = NULL;
 	if (name) {
 		zend_bool warned = FALSE;
-		const char * p_orig = name;
+		const char *p_orig = name;
 		char * p_copy;
 		p_copy = ret = emalloc(strlen(name) + 1 + 2 + 2 + 1); /* space, open, close, NullS */
 		*p_copy++ = ' ';
@@ -264,7 +264,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 {
 	unsigned int i;
 	MYSQLND_PARAM_BIND	*params;
-	enum_func_status	ret = FAIL;
+	enum_func_status ret = FAIL;
 
 	/* If no params -> skip binding and return directly */
 	if (argc == start) {
@@ -316,9 +316,9 @@ end:
 PHP_FUNCTION(mysqli_stmt_bind_param)
 {
 	zval			*args;
-	int				argc = ZEND_NUM_ARGS();
+	int argc = ZEND_NUM_ARGS();
 	int				num_vars;
-	int				start = 2;
+	int start = 2;
 	MY_STMT			*stmt;
 	zval			*mysql_stmt;
 	char			*types;
@@ -387,7 +387,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 {
 	MYSQL_BIND	*bind;
 	int			i, ofs;
-	int			var_cnt = argc;
+	int var_cnt = argc;
 	zend_long		col_type;
 	zend_ulong		rc;
 
@@ -399,7 +399,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 	bind = (MYSQL_BIND *)ecalloc(var_cnt, sizeof(MYSQL_BIND));
 	{
 		int size;
-		char *p = emalloc(size= var_cnt * (sizeof(char) + sizeof(VAR_BUFFER)));
+		char *p = emalloc(size = var_cnt * (sizeof(char) + sizeof(VAR_BUFFER)));
 		stmt->result.buf = (VAR_BUFFER *) p;
 		stmt->result.is_null = p + var_cnt * sizeof(VAR_BUFFER);
 		memset(p, 0, size);
@@ -607,7 +607,7 @@ PHP_FUNCTION(mysqli_stmt_bind_result)
 PHP_FUNCTION(mysqli_change_user)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link = NULL;
 	char		*user, *password, *dbname;
 	size_t			user_len, password_len, dbname_len;
 	zend_ulong		rc;
@@ -682,7 +682,7 @@ void php_mysqli_close(MY_MYSQL * mysql, int close_type, int resource_status)
 		zend_resource *le;
 		if ((le = zend_hash_find_ptr(&EG(persistent_list), mysql->hash_key)) != NULL) {
 			if (le->type == php_le_pmysqli()) {
-				mysqli_plist_entry *plist = (mysqli_plist_entry *) le->ptr;
+				mysqli_plist_entry *plist = (mysqli_plist_entry *)le->ptr;
 #if defined(MYSQLI_USE_MYSQLND)
 				mysqlnd_end_psession(mysql->mysql);
 #endif
@@ -738,9 +738,9 @@ PHP_FUNCTION(mysqli_commit)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	zend_long		flags = TRANS_COR_NO_OPT;
-	char *		name = NULL;
-	size_t			name_len = 0;
+	zend_long flags = TRANS_COR_NO_OPT;
+	char *name = NULL;
+	size_t name_len = 0;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O|ls", &mysql_link, mysqli_link_class_entry, &flags, &name, &name_len) == FAILURE) {
 		return;
@@ -1028,7 +1028,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 						 || stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_BIT
 #endif
 						 ) {
-							my_bool uns = (stmt->stmt->fields[i].flags & UNSIGNED_FLAG)? 1:0;
+							my_bool uns = (stmt->stmt->fields[i].flags & UNSIGNED_FLAG) ? 1 : 0;
 #if MYSQL_VERSION_ID > 50002
 							if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_BIT) {
 								switch (stmt->result.buf[i].output_len) {
@@ -1380,7 +1380,7 @@ PHP_FUNCTION(mysqli_get_client_info)
 		return;
 	}
 
-	const char * info = mysql_get_client_info();
+	const char *info = mysql_get_client_info();
 	if (info) {
 		RETURN_STRING(info);
 	}
@@ -1404,7 +1404,7 @@ PHP_FUNCTION(mysqli_get_client_version)
 PHP_FUNCTION(mysqli_get_host_info)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link = NULL;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1423,7 +1423,7 @@ PHP_FUNCTION(mysqli_get_host_info)
 PHP_FUNCTION(mysqli_get_proto_info)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link = NULL;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1438,7 +1438,7 @@ PHP_FUNCTION(mysqli_get_proto_info)
 PHP_FUNCTION(mysqli_get_server_info)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link = NULL;
 	const char	*info;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
@@ -1458,7 +1458,7 @@ PHP_FUNCTION(mysqli_get_server_info)
 PHP_FUNCTION(mysqli_get_server_version)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link = NULL;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1474,7 +1474,7 @@ PHP_FUNCTION(mysqli_get_server_version)
 PHP_FUNCTION(mysqli_info)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link = NULL;
 	const char	*info;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
@@ -1761,7 +1761,7 @@ static int mysqli_options_get_option_zval_type(int option)
 PHP_FUNCTION(mysqli_options)
 {
 	MY_MYSQL		*mysql;
-	zval			*mysql_link = NULL;
+	zval *mysql_link = NULL;
 	zval			*mysql_value;
 	zend_long			mysql_option;
 	unsigned int	l_value;
@@ -1837,7 +1837,7 @@ PHP_FUNCTION(mysqli_prepare)
 {
 	MY_MYSQL		*mysql;
 	MY_STMT			*stmt;
-	char			*query = NULL;
+	char *query = NULL;
 	size_t				query_len;
 	zval			*mysql_link;
 	MYSQLI_RESOURCE	*mysqli_resource;
@@ -1929,7 +1929,7 @@ PHP_FUNCTION(mysqli_real_query)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	char		*query = NULL;
+	char *query = NULL;
 	size_t		query_len;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Os", &mysql_link, mysqli_link_class_entry, &query, &query_len) == FAILURE) {
@@ -1958,7 +1958,7 @@ PHP_FUNCTION(mysqli_real_query)
    Escapes special characters in a string for use in a SQL statement, taking into account the current charset of the connection */
 PHP_FUNCTION(mysqli_real_escape_string) {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link = NULL;
 	char		*escapestr;
 	size_t			escapestr_len;
 	zend_string *newstr;
@@ -1982,9 +1982,9 @@ PHP_FUNCTION(mysqli_rollback)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	zend_long		flags = TRANS_COR_NO_OPT;
-	char *		name = NULL;
-	size_t			name_len = 0;
+	zend_long flags = TRANS_COR_NO_OPT;
+	char *name = NULL;
+	size_t name_len = 0;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O|ls", &mysql_link, mysqli_link_class_entry, &flags, &name, &name_len) == FAILURE) {
 		return;
@@ -2369,7 +2369,7 @@ PHP_FUNCTION(mysqli_stmt_attr_get)
 {
 	MY_STMT	*stmt;
 	zval	*mysql_stmt;
-	zend_ulong	value = 0;
+	zend_ulong value = 0;
 	zend_long	attr;
 	int		rc;
 
@@ -2530,7 +2530,7 @@ PHP_FUNCTION(mysqli_stmt_store_result)
 		  BLOB/TEXT columns after calling store_result() the memory usage of PHP will
 		  double - but this is a known problem of the simple MySQL API ;)
 		*/
-		int	i = 0;
+		int i = 0;
 
 		for (i = mysql_stmt_field_count(stmt->stmt) - 1; i >=0; --i) {
 			if (stmt->stmt->fields && (stmt->stmt->fields[i].type == MYSQL_TYPE_BLOB ||
@@ -2539,9 +2539,9 @@ PHP_FUNCTION(mysqli_stmt_store_result)
 				stmt->stmt->fields[i].type == MYSQL_TYPE_GEOMETRY))
 			{
 #if MYSQL_VERSION_ID >= 50107
-				my_bool	tmp=1;
+				my_bool tmp = 1;
 #else
-				uint32_t tmp=1;
+				uint32_t tmp = 1;
 #endif
 				mysql_stmt_attr_set(stmt->stmt, STMT_ATTR_UPDATE_MAX_LENGTH, &tmp);
 				break;
