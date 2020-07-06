@@ -1247,7 +1247,7 @@ PHP_FUNCTION(mysqli_fetch_field_direct)
 		RETURN_FALSE;
 	}
 
-	if (!(field = mysql_fetch_field_direct(result,offset))) {
+	if (!(field = mysql_fetch_field_direct(result, offset))) {
 		RETURN_FALSE;
 	}
 
