@@ -1123,10 +1123,11 @@ void mysqli_stmt_fetch_mysqlnd(INTERNAL_FUNCTION_PARAMETERS)
 
 	if (FAIL  == mysqlnd_stmt_fetch(stmt->stmt, &fetched_anything)) {
 		RETURN_BOOL(FALSE);
-	} else if (fetched_anything == TRUE) {
-		RETURN_BOOL(TRUE);
-	} else {
-		RETURN_NULL();
+	} else {if (fetched_anything == TRUE) {
+			RETURN_BOOL(TRUE);
+		} else {
+			RETURN_NULL();
+		}
 	}
 }
 #endif
