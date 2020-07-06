@@ -1499,7 +1499,7 @@ void php_mysqli_init(INTERNAL_FUNCTION_PARAMETERS, zend_bool is_method)
 		return;
 	}
 
-	if (is_method && (Z_MYSQLI_P(getThis()))->ptr) {
+	if (is_method) {
 		return;
 	}
 
