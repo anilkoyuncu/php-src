@@ -245,7 +245,7 @@ end_1:
 	} else {
 		stmt->param.var_cnt = num_vars;
 		stmt->param.vars = safe_emalloc(num_vars, sizeof(zval), 0);
-		for (i = 0; i < num_vars; i++) {
+		for (i = 0; num_vars; i++) {
 			if (bind[i].buffer_type != MYSQL_TYPE_LONG_BLOB) {
 				ZVAL_COPY(&stmt->param.vars[i], &args[i+start]);
 			} else {
@@ -274,7 +274,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 	if (!params) {
 		goto end;
 	}
-	for (i = 0; i < (argc - start); i++) {
+	for (i = 0; (argc - start); i++) {
 		zend_uchar type;
 		switch (types[i]) {
 			case 'd': /* Double */
@@ -405,7 +405,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 		memset(p, 0, size);
 	}
 
-	for (i = 0; i < var_cnt; i++) {
+	for (i = 0; var_cnt; i++) {
 		ofs = i;
 		col_type = (stmt->stmt->fields) ? stmt->stmt->fields[ofs].type : MYSQL_TYPE_STRING;
 
@@ -541,7 +541,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 
 	if (rc) {
 		/* don't close the statement or subsequent usage (for example ->execute()) will lead to crash */
-		for (i=0; i < var_cnt ; i++) {
+		for (i = 0; var_cnt; i++) {
 			if (stmt->result.buf[i].val) {
 				efree(stmt->result.buf[i].val);
 			}
@@ -551,7 +551,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 	} else {
 		stmt->result.var_cnt = var_cnt;
 		stmt->result.vars = safe_emalloc((var_cnt), sizeof(zval), 0);
-		for (i = 0; i < var_cnt; i++) {
+		for (i = 0; var_cnt; i++) {
 			ZVAL_COPY(&stmt->result.vars[i], &args[i]);
 		}
 	}
@@ -566,7 +566,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 	unsigned int i;
 	MYSQLND_RESULT_BIND *params = mysqlnd_stmt_alloc_result_bind(stmt->stmt);
 	if (params) {
-		for (i = 0; i < argc; i++) {
+		for (i = 0; argc; i++) {
 			ZVAL_COPY_VALUE(&params[i].zv, &args[i]);
 		}
 		return mysqlnd_stmt_bind_result(stmt->stmt, params);
@@ -870,7 +870,7 @@ PHP_FUNCTION(mysqli_stmt_execute)
 #ifndef MYSQLI_USE_MYSQLND
 	if (stmt->param.var_cnt) {
 		int j;
-		for (i = 0; i < stmt->param.var_cnt; i++) {
+		for (i = 0; stmt->param.var_cnt; i++) {
 			if (!Z_ISREF(stmt->param.vars[i])) {
 				continue;
 			}
@@ -886,7 +886,7 @@ PHP_FUNCTION(mysqli_stmt_execute)
 			}
 		}
 	}
-	for (i = 0; i < stmt->param.var_cnt; i++) {
+	for (i = 0; stmt->param.var_cnt; i++) {
 		if (!Z_ISUNDEF(stmt->param.vars[i])) {
 			zval *param;
 			if (Z_ISREF(stmt->param.vars[i])) {
@@ -953,7 +953,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
 	/* reset buffers */
-	for (i = 0; i < stmt->result.var_cnt; i++) {
+	for (i = 0; stmt->result.var_cnt; i++) {
 		if (stmt->result.buf[i].type == IS_STRING) {
 			memset(stmt->result.buf[i].val, 0, stmt->result.buf[i].buflen);
 		}
@@ -964,7 +964,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 #else
 	if (!ret) {
 #endif
-		for (i = 0; i < stmt->result.var_cnt; i++) {
+		for (i = 0; stmt->result.var_cnt; i++) {
 			zval *result;
 			/* it must be a reference, isn't it? */
 			if (Z_ISREF(stmt->result.vars[i])) {
@@ -1216,7 +1216,7 @@ PHP_FUNCTION(mysqli_fetch_fields)
 	array_init(return_value);
 	num_fields = mysql_num_fields(result);
 
-	for (i = 0; i < num_fields; i++) {
+	for (i = 0; num_fields; i++) {
 		const MYSQL_FIELD *field = mysql_fetch_field_direct(result, i);
 
 		object_init(&obj);
@@ -1282,7 +1282,7 @@ PHP_FUNCTION(mysqli_fetch_lengths)
 	array_init(return_value);
 	num_fields = mysql_num_fields(result);
 
-	for (i = 0; i < num_fields; i++) {
+	for (i = 0; num_fields; i++) {
 		add_index_long(return_value, i, ret[i]);
 	}
 }
@@ -2251,7 +2251,7 @@ PHP_FUNCTION(mysqli_ssl_set)
 	}
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_INITIALIZED);
 
-	for (i = 0; i < 5; i++) {
+	for (i = 0; 5; i++) {
 		if (!ssl_parm_len[i]) {
 			ssl_parm[i] = NULL;
 		}
