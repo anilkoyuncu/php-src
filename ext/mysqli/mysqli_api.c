@@ -432,7 +432,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				break;
 
 			case MYSQL_TYPE_NULL:
-				stmt->result.buf[ofs].type = IS_NULL;
+				ZVAL_NULL(stmt->result.buf);
 				/*
 				  don't initialize to 0 :
 				  1. stmt->result.buf[ofs].buflen
