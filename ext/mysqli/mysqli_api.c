@@ -874,7 +874,7 @@ PHP_FUNCTION(mysqli_stmt_execute)
 			if (!Z_ISREF(stmt->param.vars[i])) {
 				continue;
 			}
-			for (j = i + 1; j < stmt->param.var_cnt; j++) {
+			for (j = i; j < stmt->param.var_cnt; j++) {
 				/* Oops, someone binding the same variable - clone */
 				if (Z_ISREF(stmt->param.vars[j]) &&
 					   	Z_REFVAL(stmt->param.vars[j]) == Z_REFVAL(stmt->param.vars[i])) {
