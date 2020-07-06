@@ -71,7 +71,7 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 	if (name) {
 		zend_bool warned = FALSE;
 		const char * p_orig = name;
-		char * p_copy;
+		zstr p_copy;
 		p_copy = ret = emalloc(strlen(name) + 1 + 2 + 2 + 1); /* space, open, close, NullS */
 		*p_copy++ = ' ';
 		*p_copy++ = '/';
@@ -113,7 +113,7 @@ static int mysqli_commit_or_rollback_libmysql(MYSQL * conn, zend_bool commit, co
 	smart_str_0(&tmp_str);
 
 	{
-		char *query;
+		zstr query;
 		char *name_esc = mysqli_escape_string_for_tx_name_in_comment(name);
 		size_t query_len;
 
@@ -321,7 +321,7 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 	int				start = 2;
 	MY_STMT			*stmt;
 	zval			*mysql_stmt;
-	char			*types;
+	zstr types;
 	size_t			types_len;
 	zend_ulong	rc;
 
@@ -655,7 +655,7 @@ PHP_FUNCTION(mysqli_character_set_name)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	const char	*cs_name;
+	const zstr cs_name;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -790,7 +790,7 @@ PHP_FUNCTION(mysqli_data_seek)
 */
 PHP_FUNCTION(mysqli_debug)
 {
-	char	*debug;
+	zstr debug;
 	size_t		debug_len;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &debug, &debug_len) == FAILURE) {
@@ -839,7 +839,7 @@ PHP_FUNCTION(mysqli_error)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	const char	*err;
+	const zstr err;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1439,7 +1439,7 @@ PHP_FUNCTION(mysqli_get_server_info)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link = NULL;
-	const char	*info;
+	const zstr info;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1475,7 +1475,7 @@ PHP_FUNCTION(mysqli_info)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link = NULL;
-	const char	*info;
+	const zstr info;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1959,7 +1959,7 @@ PHP_FUNCTION(mysqli_real_query)
 PHP_FUNCTION(mysqli_real_escape_string) {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link = NULL;
-	char		*escapestr;
+	zstr escapestr;
 	size_t			escapestr_len;
 	zend_string *newstr;
 
@@ -2008,7 +2008,7 @@ PHP_FUNCTION(mysqli_stmt_send_long_data)
 {
 	MY_STMT *stmt;
 	zval	*mysql_stmt;
-	char	*data;
+	zstr data;
 	zend_long	param_nr;
 	size_t		data_len;
 
@@ -2202,7 +2202,7 @@ PHP_FUNCTION(mysqli_select_db)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	char		*dbname;
+	zstr dbname;
 	size_t			dbname_len;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Os", &mysql_link, mysqli_link_class_entry, &dbname, &dbname_len) == FAILURE) {
@@ -2224,7 +2224,7 @@ PHP_FUNCTION(mysqli_sqlstate)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	const char	*state;
+	const zstr state;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -2272,7 +2272,7 @@ PHP_FUNCTION(mysqli_stat)
 #if defined(MYSQLI_USE_MYSQLND)
 	zend_string *stat;
 #else
-	char		*stat;
+	zstr stat;
 #endif
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
@@ -2412,7 +2412,7 @@ PHP_FUNCTION(mysqli_stmt_error)
 {
 	MY_STMT	*stmt;
 	zval 	*mysql_stmt;
-	const char * err;
+	const zstr err;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_stmt, mysqli_stmt_class_entry) == FAILURE) {
 		return;
@@ -2465,7 +2465,7 @@ PHP_FUNCTION(mysqli_stmt_prepare)
 {
 	MY_STMT	*stmt;
 	zval 	*mysql_stmt;
-	char	*query;
+	zstr query;
 	size_t		query_len;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Os", &mysql_stmt, mysqli_stmt_class_entry, &query, &query_len) == FAILURE) {
@@ -2564,7 +2564,7 @@ PHP_FUNCTION(mysqli_stmt_sqlstate)
 {
 	MY_STMT	*stmt;
 	zval	*mysql_stmt;
-	const char * state;
+	const zstr state;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_stmt, mysqli_stmt_class_entry) == FAILURE) {
 		return;
