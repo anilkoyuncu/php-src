@@ -98,7 +98,7 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 		}
 		*p_copy++ = '*';
 		*p_copy++ = '/';
-		*p_copy++ = 0;
+		*p_copy++ = '\0';
 	}
 	return ret;
 }
@@ -193,7 +193,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 	stmt->param.is_null = ecalloc(num_vars, sizeof(char));
 	bind = (MYSQL_BIND *) ecalloc(num_vars, sizeof(MYSQL_BIND));
 
-	ofs = 0;
+	ofs = '\0';
 	for (i = start; i < argc; i++) {
 		zval *param;
 		if (Z_ISREF(args[i])) {
@@ -991,7 +991,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 									*p-- = (uval % 10) + 48;
 									uval = uval / 10;
 								} while (--j > 0);
-								tmp[10]= '\0';
+								tmp[10] = '\0';
 								/* unsigned int > INT_MAX is 10 digits - ALWAYS */
 								ZEND_TRY_ASSIGN_REF_STRINGL(result, tmp, 10);
 								efree(tmp);
@@ -1871,7 +1871,7 @@ PHP_FUNCTION(mysqli_prepare)
 			MYSQLND_ERROR_INFO error_info = *mysql->mysql->data->error_info;
 			mysql->mysql->data->error_info->error_list.head = NULL;
 			mysql->mysql->data->error_info->error_list.tail = NULL;
-			mysql->mysql->data->error_info->error_list.count = 0;
+			mysql->mysql->data->error_info->error_list.count = '\0';
 #endif
 			mysqli_stmt_close(stmt->stmt, FALSE);
 			stmt->stmt = NULL;
