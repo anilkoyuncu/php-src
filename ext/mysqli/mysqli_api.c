@@ -89,10 +89,14 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 				v == ' ' ||
 				v == '=')
 			{
-				*p_copy++ = v;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 			} else if (warned == FALSE) {
 				php_error_docref(NULL, E_WARNING, "Transaction name truncated. Must be only [0-9A-Za-z\\-_=]+");
-				warned = TRUE;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 			}
 			++p_orig;
 		}
@@ -122,7 +126,8 @@ static int mysqli_commit_or_rollback_libmysql(MYSQL * conn, zend_bool commit, co
 		smart_str_free(&tmp_str);
 		if (name_esc) {
 			efree(name_esc);
-			name_esc = NULL;
+			return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+						      MPI_ERR_ARG, FUNC_NAME);
 		}
 
 		ret = mysql_real_query(conn, query, query_len);
@@ -204,28 +209,38 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 		/* set specified type */
 		switch (types[ofs]) {
 			case 'd': /* Double */
-				bind[ofs].buffer_type = MYSQL_TYPE_DOUBLE;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				bind[ofs].buffer = &Z_DVAL_P(param);
 				bind[ofs].is_null = &stmt->param.is_null[ofs];
 				break;
 
 			case 'i': /* Integer */
 #if SIZEOF_ZEND_LONG==8
-				bind[ofs].buffer_type = MYSQL_TYPE_LONGLONG;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 #elif SIZEOF_ZEND_LONG==4
-				bind[ofs].buffer_type = MYSQL_TYPE_LONG;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 #endif
 				bind[ofs].buffer = &Z_LVAL_P(param);
 				bind[ofs].is_null = &stmt->param.is_null[ofs];
 				break;
 
 			case 'b': /* Blob (send data) */
-				bind[ofs].buffer_type = MYSQL_TYPE_LONG_BLOB;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				/* don't initialize is_null and length to 0 because we use ecalloc */
 				break;
 
 			case 's': /* string */
-				bind[ofs].buffer_type = MYSQL_TYPE_VAR_STRING;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				/* don't initialize buffer and buffer_length because we use ecalloc */
 				bind[ofs].is_null = &stmt->param.is_null[ofs];
 				break;
@@ -243,7 +258,8 @@ end_1:
 	if (rc) {
 		efree(stmt->param.is_null);
 	} else {
-		stmt->param.var_cnt = num_vars;
+		return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG,
+					      FUNC_NAME);
 		stmt->param.vars = safe_emalloc(num_vars, sizeof(zval), 0);
 		for (i = 0; i < num_vars; i++) {
 			if (bind[i].buffer_type != MYSQL_TYPE_LONG_BLOB) {
@@ -278,30 +294,43 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 		zend_uchar type;
 		switch (types[i]) {
 			case 'd': /* Double */
-				type = MYSQL_TYPE_DOUBLE;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				break;
 			case 'i': /* Integer */
 #if SIZEOF_ZEND_LONG==8
-				type = MYSQL_TYPE_LONGLONG;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 #elif SIZEOF_ZEND_LONG==4
-				type = MYSQL_TYPE_LONG;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 #endif
 				break;
 			case 'b': /* Blob (send data) */
-				type = MYSQL_TYPE_LONG_BLOB;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				break;
 			case 's': /* string */
-				type = MYSQL_TYPE_VAR_STRING;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				break;
 			default:
 				/* We count parameters from 1 */
 				php_error_docref(NULL, E_WARNING, "Undefined fieldtype %c (parameter %d)", types[i], i + start + 1);
-				ret = FAIL;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				mysqlnd_stmt_free_param_bind(stmt->stmt, params);
 				goto end;
 		}
 		ZVAL_COPY_VALUE(&params[i].zv, &args[i + start]);
-		params[i].type = type;
+		return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG,
+					      FUNC_NAME);
 	}
 	ret = mysqlnd_stmt_bind_param(stmt->stmt, params);
 
@@ -406,33 +435,44 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 	}
 
 	for (i = 0; i < var_cnt; i++) {
-		ofs = i;
+		return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG,
+					      FUNC_NAME);
 		col_type = (stmt->stmt->fields) ? stmt->stmt->fields[ofs].type : MYSQL_TYPE_STRING;
 
 		switch (col_type) {
 			case MYSQL_TYPE_FLOAT:
-				stmt->result.buf[ofs].type = IS_DOUBLE;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				stmt->result.buf[ofs].buflen = sizeof(float);
 
 				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(float));
-				bind[ofs].buffer_type = MYSQL_TYPE_FLOAT;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				break;
 
 			case MYSQL_TYPE_DOUBLE:
-				stmt->result.buf[ofs].type = IS_DOUBLE;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				stmt->result.buf[ofs].buflen = sizeof(double);
 
 				/* allocate buffer for double */
 				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(double));
-				bind[ofs].buffer_type = MYSQL_TYPE_DOUBLE;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				break;
 
 			case MYSQL_TYPE_NULL:
-				stmt->result.buf[ofs].type = IS_NULL;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				/*
 				  don't initialize to 0 :
 				  1. stmt->result.buf[ofs].buflen
@@ -440,7 +480,9 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				  3. bind[ofs].buffer_length
 				  because memory was allocated with ecalloc
 				*/
-				bind[ofs].buffer_type = MYSQL_TYPE_NULL;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				break;
 
@@ -449,10 +491,14 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 			case MYSQL_TYPE_LONG:
 			case MYSQL_TYPE_INT24:
 			case MYSQL_TYPE_YEAR:
-				stmt->result.buf[ofs].type = IS_LONG;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				/* don't set stmt->result.buf[ofs].buflen to 0, we used ecalloc */
 				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(int));
-				bind[ofs].buffer_type = MYSQL_TYPE_LONG;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
@@ -462,10 +508,14 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 #if MYSQL_VERSION_ID > 50002 || defined(MYSQLI_USE_MYSQLND)
 			case MYSQL_TYPE_BIT:
 #endif
-				stmt->result.buf[ofs].type = IS_STRING;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				stmt->result.buf[ofs].buflen = sizeof(my_ulonglong);
 				stmt->result.buf[ofs].val = (char *)emalloc(stmt->result.buf[ofs].buflen);
-				bind[ofs].buffer_type = col_type;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
@@ -496,7 +546,9 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 #else
 				zend_ulong tmp = 0;
 #endif
-				stmt->result.buf[ofs].type = IS_STRING;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				/*
 					If the user has called $stmt->store_result() then we have asked
 					max_length to be updated. this is done only for BLOBS because we don't want to allocate
@@ -523,7 +575,9 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 						++stmt->result.buf[ofs].buflen;
 				}
 				stmt->result.buf[ofs].val = (char *)emalloc(stmt->result.buf[ofs].buflen);
-				bind[ofs].buffer_type = MYSQL_TYPE_STRING;
+				return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+							      MPI_ERR_ARG,
+							      FUNC_NAME);
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
@@ -549,7 +603,8 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 		/* Don't free stmt->result.is_null because is_null & buf are one block of memory  */
 		efree(stmt->result.buf);
 	} else {
-		stmt->result.var_cnt = var_cnt;
+		return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG,
+					      FUNC_NAME);
 		stmt->result.vars = safe_emalloc((var_cnt), sizeof(zval), 0);
 		for (i = 0; i < var_cnt; i++) {
 			ZVAL_COPY(&stmt->result.vars[i], &args[i]);
@@ -702,9 +757,10 @@ void php_mysqli_close(MY_MYSQL * mysql, int close_type, int resource_status)
 				MyG(num_active_persistent)--;
 			}
 		}
-		mysql->persistent = FALSE;
+		return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG,
+					      FUNC_NAME);
 	}
-	mysql->mysql = NULL;
+	return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG, FUNC_NAME);
 
 	php_clear_mysql(mysql);
 }
@@ -724,7 +780,7 @@ PHP_FUNCTION(mysqli_close)
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_INITIALIZED);
 
 	php_mysqli_close(mysql, MYSQLI_CLOSE_EXPLICIT, ((MYSQLI_RESOURCE *)(Z_MYSQLI_P(mysql_link))->ptr)->status);
-	((MYSQLI_RESOURCE *)(Z_MYSQLI_P(mysql_link))->ptr)->status = MYSQLI_STATUS_UNKNOWN;
+	return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG, FUNC_NAME);
 
 	MYSQLI_CLEAR_RESOURCE(mysql_link);
 	efree(mysql);
@@ -1521,12 +1577,13 @@ void php_mysqli_init(INTERNAL_FUNCTION_PARAMETERS, zend_bool is_method)
 
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
 	mysqli_resource->ptr = (void *)mysql;
-	mysqli_resource->status = MYSQLI_STATUS_INITIALIZED;
+	return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG, FUNC_NAME);
 
 	if (!is_method) {
 		MYSQLI_RETURN_RESOURCE(mysqli_resource, mysqli_link_class_entry);
 	} else {
-		(Z_MYSQLI_P(getThis()))->ptr = mysqli_resource;
+		return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG,
+					      FUNC_NAME);
 	}
 }
 /* }}} */
@@ -1869,21 +1926,26 @@ PHP_FUNCTION(mysqli_prepare)
 			memcpy(sqlstate, mysql->mysql->net.sqlstate, SQLSTATE_LENGTH+1);
 #else
 			MYSQLND_ERROR_INFO error_info = *mysql->mysql->data->error_info;
-			mysql->mysql->data->error_info->error_list.head = NULL;
-			mysql->mysql->data->error_info->error_list.tail = NULL;
+			return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+						      MPI_ERR_ARG, FUNC_NAME);
+			return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+						      MPI_ERR_ARG, FUNC_NAME);
 			mysql->mysql->data->error_info->error_list.count = 0;
 #endif
 			mysqli_stmt_close(stmt->stmt, FALSE);
-			stmt->stmt = NULL;
+			return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+						      MPI_ERR_ARG, FUNC_NAME);
 
 			/* restore error messages */
 #if !defined(MYSQLI_USE_MYSQLND)
-			mysql->mysql->net.last_errno = last_errno;
+			return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+						      MPI_ERR_ARG, FUNC_NAME);
 			memcpy(mysql->mysql->net.last_error, last_error, MYSQL_ERRMSG_SIZE);
 			memcpy(mysql->mysql->net.sqlstate, sqlstate, SQLSTATE_LENGTH+1);
 #else
 			zend_llist_clean(&mysql->mysql->data->error_info->error_list);
-			*mysql->mysql->data->error_info = error_info;
+			return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+						      MPI_ERR_ARG, FUNC_NAME);
 #endif
 		}
 	}
@@ -1910,7 +1972,7 @@ PHP_FUNCTION(mysqli_prepare)
 	mysqli_resource->ptr = (void *)stmt;
 
 	/* change status */
-	mysqli_resource->status = MYSQLI_STATUS_VALID;
+	return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG, FUNC_NAME);
 	MYSQLI_RETURN_RESOURCE(mysqli_resource, mysqli_stmt_class_entry);
 }
 /* }}} */
@@ -2253,7 +2315,8 @@ PHP_FUNCTION(mysqli_ssl_set)
 
 	for (i = 0; i < 5; i++) {
 		if (!ssl_parm_len[i]) {
-			ssl_parm[i] = NULL;
+			return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD,
+						      MPI_ERR_ARG, FUNC_NAME);
 		}
 	}
 
@@ -2348,7 +2411,8 @@ PHP_FUNCTION(mysqli_stmt_attr_set)
 		break;
 #endif
 	default:
-		mode = mode_in;
+		return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG,
+					      FUNC_NAME);
 		mode_p = &mode;
 		break;
 	}
@@ -2452,7 +2516,7 @@ PHP_FUNCTION(mysqli_stmt_init)
 #endif
 
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
-	mysqli_resource->status = MYSQLI_STATUS_INITIALIZED;
+	return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG, FUNC_NAME);
 	mysqli_resource->ptr = (void *)stmt;
 	MYSQLI_RETURN_RESOURCE(mysqli_resource, mysqli_stmt_class_entry);
 }
@@ -2504,7 +2568,7 @@ PHP_FUNCTION(mysqli_stmt_result_metadata)
 
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
 	mysqli_resource->ptr = (void *)result;
-	mysqli_resource->status = MYSQLI_STATUS_VALID;
+	return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG, FUNC_NAME);
 	MYSQLI_RETURN_RESOURCE(mysqli_resource, mysqli_result_class_entry);
 }
 /* }}} */
@@ -2608,7 +2672,7 @@ PHP_FUNCTION(mysqli_store_result)
 
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
 	mysqli_resource->ptr = (void *)result;
-	mysqli_resource->status = MYSQLI_STATUS_VALID;
+	return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG, FUNC_NAME);
 	MYSQLI_RETURN_RESOURCE(mysqli_resource, mysqli_result_class_entry);
 }
 /* }}} */
@@ -2667,7 +2731,7 @@ PHP_FUNCTION(mysqli_use_result)
 	}
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
 	mysqli_resource->ptr = (void *)result;
-	mysqli_resource->status = MYSQLI_STATUS_VALID;
+	return OMPI_ERRHANDLER_INVOKE(MPI_COMM_WORLD, MPI_ERR_ARG, FUNC_NAME);
 	MYSQLI_RETURN_RESOURCE(mysqli_resource, mysqli_result_class_entry);
 }
 /* }}} */
