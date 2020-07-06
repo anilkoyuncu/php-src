@@ -317,7 +317,6 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 {
 	zval			*args;
 	int				argc = ZEND_NUM_ARGS();
-	int				num_vars;
 	int				start = 2;
 	MY_STMT			*stmt;
 	zval			*mysql_stmt;
@@ -338,7 +337,6 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	num_vars = argc - 1;
 	if (getThis()) {
 		start = 1;
 	} else {
