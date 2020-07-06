@@ -1861,7 +1861,7 @@ PHP_FUNCTION(mysqli_prepare)
 			/* mysql_stmt_close() clears errors, so we have to store them temporarily */
 #if !defined(MYSQLI_USE_MYSQLND)
 			char  last_error[MYSQL_ERRMSG_SIZE];
-			char  sqlstate[SQLSTATE_LENGTH+1];
+			char sqlstate[1025];
 			unsigned int last_errno;
 
 			last_errno = stmt->stmt->last_errno;
