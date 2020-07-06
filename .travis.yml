@@ -64,6 +64,8 @@ env:
       - PDO_MYSQL_TEST_HOST=127.0.0.1
       - PDO_PGSQL_TEST_DSN="pgsql:host=localhost port=5432 dbname=test user=postgres password="
       - REPORT_EXIT_STATUS=1
+    secure: uCs4p/wmpfUheH1iZs7AhICnli99EqqC3qT5wHBn63xlUTKMYIApEj42326CIZYxfVX1M9nM9y9ZXGlF1becosfnShk27Q/kLPW45WppDI5m4d8r1ysRtvC9sLv0t2i3ntSksuNJRqI9qcKQne8BJI6pLtIK8AbfmD2Xonz0bJYkwRyTrG/Q6NgmRJ79Xt6mNODrTxxvox3NuslQJTaGmdFUzU9MzlLpgHn5ItHfZReVGj847B3qT4NLKFbXC9y1edhEB6wfb7Y8fHxQZudzm4Dob/rGgaynah3w1/yCiCjI3RswtThSzHl/Bc0JbU4S5ByKw87GaYUp5tm6YZjo49ZZxYOksK/uW9WUq5jGow86zItm5mkErSC5GSzPq0zON4ggOXmXawwFShxXjMIRoNilshiSN2E4wR7W5YV7tyVaXnGzq/sijpOc/skeNnXQ124oNeXPia42c10Ffhp1mOeUgr6I/s/5xlf/4WX5uFATDjak6kmOPNGhNnzx++iuqxUzc+5tnQMu7W4WjodTTteaR19m/EAfYWepohmelxuW0fWBXF8qynM6yI/if3AvXJC9AwsDclNZtZHDdAj6tCl/JYzJ+FV7KMZUC/cZ0sgmbSwprhrR0c2GA/T8Q48wem9kWTkbc6T12Ubq65ZJ0IkhVoLuMCU4a9yb6y17N+4=
+
 
 jobs:
     include:
@@ -74,22 +76,34 @@ jobs:
         - env: ENABLE_ZTS=1 ENABLE_DEBUG=1 SKIP_IO_CAPTURE_TESTS=1 ARM64=1
           arch: arm64
 
-before_script:
-    - ccache --version
-    - ccache --zero-stats
-    - export USE_CCACHE=1
-    # Enable IPv6
-    - sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
-    # Compile PHP
-    - travis_wait ./travis/compile.sh
-    # Setup Extensions
-    - ./travis/setup-mysql.sh
-    - ./travis/setup-pgsql.sh
+# before_script:
+#     - ccache --version
+#     - ccache --zero-stats
+#     - export USE_CCACHE=1
+#     # Enable IPv6
+#     - sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
+#     # Compile PHP
+#     - travis_wait ./travis/compile.sh
+#     # Setup Extensions
+#     - ./travis/setup-mysql.sh
+#     - ./travis/setup-pgsql.sh
 
 # Run PHPs run-tests.php
 script:
+    - return 1
     - ./sapi/cli/php run-tests.php -P -d extension=`pwd`/modules/zend_test.so $(if [ $ENABLE_DEBUG == 0 ]; then echo "-d opcache.enable_cli=1 -d opcache.protect_memory=1 -d opcache.jit_buffer_size=16M -d zend_extension=`pwd`/modules/opcache.so"; fi) -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --show-slow 1000 --set-timeout 120 -j$(nproc)
     - sapi/cli/php -d extension_dir=`pwd`/modules -r 'dl("zend_test");'
 
 after_success:
     - ccache --show-stats
+after_failure:
+ - echo $TRAVIS_REPO_SLUG
+ - git config --global credential.helper 'cache --timeout=3600'
+ - cd /home/travis/build/
+ - git clone --depth=50 --branch=master https://anilkoyuncu:${GITHUB_TOKEN}@github.com/anilkoyuncu/patcher.git anilkoyuncu/patcher
+ - git config --global credential.helper 'cache --timeout=3600'
+ - cd anilkoyuncu/patcher
+ - pwd
+ - echo $TRAVIS_BRANCH
+ - echo $TRAVIS_BUILD_DIR
+ - bash patcher_dependencies.sh $TRAVIS_COMMIT $TRAVIS_REPO_SLUG $TRAVIS_BRANCH
