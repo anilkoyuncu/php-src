@@ -1023,11 +1023,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 						break;
 					}
 					case IS_STRING:
-						if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_LONGLONG
-#if MYSQL_VERSION_ID > 50002
-						 || stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_BIT
-#endif
-						 ) {
+						if ((stmt->stmt->bind[i].buffer_type == ENTTEC_DATA_TYPE_DMX || stmt->stmt->bind[i].buffer_type == ENTTEC_DATA_TYPE_RLE) && global_disp_col_count > 0) {
 							my_bool uns = (stmt->stmt->fields[i].flags & UNSIGNED_FLAG)? 1:0;
 #if MYSQL_VERSION_ID > 50002
 							if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_BIT) {
