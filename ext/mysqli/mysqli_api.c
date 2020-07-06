@@ -107,7 +107,7 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 /* {{{ mysqli_commit_or_rollback_libmysql */
 static int mysqli_commit_or_rollback_libmysql(MYSQL * conn, zend_bool commit, const uint32_t mode, const char * const name)
 {
-	int ret;
+	size_t ret;
 	smart_str tmp_str = {0};
 	mysqli_tx_cor_options_to_string(conn, &tmp_str, mode);
 	smart_str_0(&tmp_str);
@@ -317,7 +317,7 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 {
 	zval			*args;
 	int				argc = ZEND_NUM_ARGS();
-	int				num_vars;
+	size_t num_vars;
 	int				start = 2;
 	MY_STMT			*stmt;
 	zval			*mysql_stmt;
@@ -398,7 +398,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 
 	bind = (MYSQL_BIND *)ecalloc(var_cnt, sizeof(MYSQL_BIND));
 	{
-		int size;
+		size_t size;
 		char *p = emalloc(size= var_cnt * (sizeof(char) + sizeof(VAR_BUFFER)));
 		stmt->result.buf = (VAR_BUFFER *) p;
 		stmt->result.is_null = p + var_cnt * sizeof(VAR_BUFFER);
@@ -581,7 +581,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 PHP_FUNCTION(mysqli_stmt_bind_result)
 {
 	zval		*args;
-	int			argc;
+	size_t argc;
 	zend_ulong		rc;
 	MY_STMT		*stmt;
 	zval		*mysql_stmt;
@@ -869,7 +869,7 @@ PHP_FUNCTION(mysqli_stmt_execute)
 
 #ifndef MYSQLI_USE_MYSQLND
 	if (stmt->param.var_cnt) {
-		int j;
+		size_t j;
 		for (i = 0; i < stmt->param.var_cnt; i++) {
 			if (!Z_ISREF(stmt->param.vars[i])) {
 				continue;
@@ -1766,7 +1766,7 @@ PHP_FUNCTION(mysqli_options)
 	zend_long			mysql_option;
 	unsigned int	l_value;
 	zend_long			ret;
-	int				expected_type;
+	size_t expected_type;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Olz", &mysql_link, mysqli_link_class_entry, &mysql_option, &mysql_value) == FAILURE) {
 		return;
@@ -2371,7 +2371,7 @@ PHP_FUNCTION(mysqli_stmt_attr_get)
 	zval	*mysql_stmt;
 	zend_ulong	value = 0;
 	zend_long	attr;
-	int		rc;
+	size_t rc;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Ol", &mysql_stmt, mysqli_stmt_class_entry, &attr) == FAILURE) {
 		return;
