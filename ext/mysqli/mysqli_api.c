@@ -139,7 +139,7 @@ PHP_FUNCTION(mysqli_affected_rows)
 {
 	MY_MYSQL 		*mysql;
 	zval  			*mysql_link;
-	my_ulonglong	rc;
+	long rc;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -944,7 +944,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 	unsigned int	i;
 	zend_ulong			ret;
 	unsigned int	uval;
-	my_ulonglong	llval;
+	long llval;
 
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_stmt, mysqli_stmt_class_entry) == FAILURE) {
@@ -1552,7 +1552,7 @@ PHP_FUNCTION(mysqli_init_method)
 PHP_FUNCTION(mysqli_insert_id)
 {
 	MY_MYSQL		*mysql;
-	my_ulonglong	rc;
+	long rc;
 	zval			*mysql_link;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
@@ -2034,7 +2034,7 @@ PHP_FUNCTION(mysqli_stmt_affected_rows)
 {
 	MY_STMT			*stmt;
 	zval			*mysql_stmt;
-	my_ulonglong	rc;
+	long rc;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_stmt, mysqli_stmt_class_entry) == FAILURE) {
 		return;
@@ -2129,7 +2129,7 @@ PHP_FUNCTION(mysqli_stmt_free_result)
 PHP_FUNCTION(mysqli_stmt_insert_id)
 {
 	MY_STMT			*stmt;
-	my_ulonglong	rc;
+	long rc;
 	zval			*mysql_stmt;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_stmt, mysqli_stmt_class_entry) == FAILURE) {
@@ -2183,7 +2183,7 @@ PHP_FUNCTION(mysqli_stmt_num_rows)
 {
 	MY_STMT			*stmt;
 	zval			*mysql_stmt;
-	my_ulonglong	rc;
+	long rc;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_stmt, mysqli_stmt_class_entry) == FAILURE) {
 		return;
