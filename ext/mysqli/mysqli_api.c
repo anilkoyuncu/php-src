@@ -67,7 +67,7 @@ static void mysqli_tx_cor_options_to_string(const MYSQL * const conn, smart_str 
 char *
 mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 {
-	char * ret = NULL;
+	char *ret;
 	if (name) {
 		zend_bool warned = FALSE;
 		const char * p_orig = name;
@@ -607,7 +607,7 @@ PHP_FUNCTION(mysqli_stmt_bind_result)
 PHP_FUNCTION(mysqli_change_user)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link;
 	char		*user, *password, *dbname;
 	size_t			user_len, password_len, dbname_len;
 	zend_ulong		rc;
@@ -739,7 +739,7 @@ PHP_FUNCTION(mysqli_commit)
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
 	zend_long		flags = TRANS_COR_NO_OPT;
-	char *		name = NULL;
+	char *name;
 	size_t			name_len = 0;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O|ls", &mysql_link, mysqli_link_class_entry, &flags, &name, &name_len) == FAILURE) {
@@ -1404,7 +1404,7 @@ PHP_FUNCTION(mysqli_get_client_version)
 PHP_FUNCTION(mysqli_get_host_info)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1423,7 +1423,7 @@ PHP_FUNCTION(mysqli_get_host_info)
 PHP_FUNCTION(mysqli_get_proto_info)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1438,7 +1438,7 @@ PHP_FUNCTION(mysqli_get_proto_info)
 PHP_FUNCTION(mysqli_get_server_info)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link;
 	const char	*info;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
@@ -1458,7 +1458,7 @@ PHP_FUNCTION(mysqli_get_server_info)
 PHP_FUNCTION(mysqli_get_server_version)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
@@ -1474,7 +1474,7 @@ PHP_FUNCTION(mysqli_get_server_version)
 PHP_FUNCTION(mysqli_info)
 {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link;
 	const char	*info;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
@@ -1761,7 +1761,7 @@ static int mysqli_options_get_option_zval_type(int option)
 PHP_FUNCTION(mysqli_options)
 {
 	MY_MYSQL		*mysql;
-	zval			*mysql_link = NULL;
+	zval *mysql_link;
 	zval			*mysql_value;
 	zend_long			mysql_option;
 	unsigned int	l_value;
@@ -1837,7 +1837,7 @@ PHP_FUNCTION(mysqli_prepare)
 {
 	MY_MYSQL		*mysql;
 	MY_STMT			*stmt;
-	char			*query = NULL;
+	char *query;
 	size_t				query_len;
 	zval			*mysql_link;
 	MYSQLI_RESOURCE	*mysqli_resource;
@@ -1929,7 +1929,7 @@ PHP_FUNCTION(mysqli_real_query)
 {
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
-	char		*query = NULL;
+	char *query;
 	size_t		query_len;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Os", &mysql_link, mysqli_link_class_entry, &query, &query_len) == FAILURE) {
@@ -1958,7 +1958,7 @@ PHP_FUNCTION(mysqli_real_query)
    Escapes special characters in a string for use in a SQL statement, taking into account the current charset of the connection */
 PHP_FUNCTION(mysqli_real_escape_string) {
 	MY_MYSQL	*mysql;
-	zval		*mysql_link = NULL;
+	zval *mysql_link;
 	char		*escapestr;
 	size_t			escapestr_len;
 	zend_string *newstr;
@@ -1983,7 +1983,7 @@ PHP_FUNCTION(mysqli_rollback)
 	MY_MYSQL	*mysql;
 	zval		*mysql_link;
 	zend_long		flags = TRANS_COR_NO_OPT;
-	char *		name = NULL;
+	char *name;
 	size_t			name_len = 0;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O|ls", &mysql_link, mysqli_link_class_entry, &flags, &name, &name_len) == FAILURE) {
@@ -2301,7 +2301,7 @@ PHP_FUNCTION(mysqli_stat)
 PHP_FUNCTION(mysqli_refresh)
 {
 	MY_MYSQL *mysql;
-	zval *mysql_link = NULL;
+	zval *mysql_link;
 	zend_long options;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Ol", &mysql_link, mysqli_link_class_entry, &options) == FAILURE) {
