@@ -407,7 +407,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 
 	for (i = 0; i < var_cnt; i++) {
 		ofs = i;
-		col_type = (stmt->stmt->fields) ? stmt->stmt->fields[ofs].type : MYSQL_TYPE_STRING;
+		col_type = (stmt->stmt->fields) ? stmt->stmt->fields[ofs].type : (char *)MYSQL_TYPE_STRING;
 
 		switch (col_type) {
 			case MYSQL_TYPE_FLOAT:
@@ -455,7 +455,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].buffer_type = MYSQL_TYPE_LONG;
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
-				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
+				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : (char *)0;
 				break;
 
 			case MYSQL_TYPE_LONGLONG:
@@ -469,7 +469,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
-				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
+				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : (char *)0;
 				bind[ofs].length = &stmt->result.buf[ofs].output_len;
 				break;
 
@@ -511,8 +511,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 					  different lengths and you will see that we get different lengths in stmt->stmt->fields[ofs].length
 					  The just take 256 and saves us from realloc-ing.
 					*/
-					stmt->result.buf[ofs].buflen =
-						(stmt->stmt->fields) ? (stmt->stmt->fields[ofs].length) ? stmt->stmt->fields[ofs].length + 1: 256: 256;
+					stmt->result.buf[ofs].buflen = (stmt->stmt->fields) ? (stmt->stmt->fields[ofs].length) ? stmt->stmt->fields[ofs].length + 1 : 256 : (char *)256;
 
 				} else {
 					/*
@@ -2594,7 +2593,7 @@ PHP_FUNCTION(mysqli_store_result)
 	}
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
 #if MYSQLI_USE_MYSQLND
-	result = flags & MYSQLI_STORE_RESULT_COPY_DATA? mysqlnd_store_result_ofs(mysql->mysql) : mysqlnd_store_result(mysql->mysql);
+	result = flags & MYSQLI_STORE_RESULT_COPY_DATA ? mysqlnd_store_result_ofs(mysql->mysql) : (char *)mysqlnd_store_result(mysql->mysql);
 #else
 	result = mysql_store_result(mysql->mysql);
 #endif
