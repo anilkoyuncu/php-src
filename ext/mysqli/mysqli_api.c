@@ -872,7 +872,7 @@ PHP_FUNCTION(mysqli_stmt_execute)
 		int j;
 		for (i = 0; i < stmt->param.var_cnt; i++) {
 			if (!Z_ISREF(stmt->param.vars[i])) {
-				continue;
+				break;
 			}
 			for (j = i; j < stmt->param.var_cnt; j++) {
 				/* Oops, someone binding the same variable - clone */
@@ -970,7 +970,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 			if (Z_ISREF(stmt->result.vars[i])) {
 				result = &stmt->result.vars[i];
 			} else {
-				continue; // but be safe ...
+				break; // but be safe ...
 			}
 			/* Even if the string is of length zero there is one byte alloced so efree() in all cases */
 			if (!stmt->result.is_null[i]) {
