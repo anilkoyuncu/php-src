@@ -190,7 +190,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 		php_free_stmt_bind_buffer(stmt->param, FETCH_SIMPLE);
 	}
 
-	stmt->param.is_null = ecalloc(num_vars, sizeof(char));
+	stmt->param.bg = ecalloc(num_vars, sizeof(char));
 	bind = (MYSQL_BIND *) ecalloc(num_vars, sizeof(MYSQL_BIND));
 
 	ofs = 0;
@@ -204,30 +204,30 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 		/* set specified type */
 		switch (types[ofs]) {
 			case 'd': /* Double */
-				bind[ofs].buffer_type = MYSQL_TYPE_DOUBLE;
-				bind[ofs].buffer = &Z_DVAL_P(param);
-				bind[ofs].is_null = &stmt->param.is_null[ofs];
+				bind[ofs].bg = MYSQL_TYPE_DOUBLE;
+				bind[ofs].bg = &Z_DVAL_P(param);
+				bind[ofs].bg = &stmt->param.is_null[ofs];
 				break;
 
 			case 'i': /* Integer */
 #if SIZEOF_ZEND_LONG==8
-				bind[ofs].buffer_type = MYSQL_TYPE_LONGLONG;
+				bind[ofs].bg = MYSQL_TYPE_LONGLONG;
 #elif SIZEOF_ZEND_LONG==4
-				bind[ofs].buffer_type = MYSQL_TYPE_LONG;
+				bind[ofs].bg = MYSQL_TYPE_LONG;
 #endif
-				bind[ofs].buffer = &Z_LVAL_P(param);
-				bind[ofs].is_null = &stmt->param.is_null[ofs];
+				bind[ofs].bg = &Z_LVAL_P(param);
+				bind[ofs].bg = &stmt->param.is_null[ofs];
 				break;
 
 			case 'b': /* Blob (send data) */
-				bind[ofs].buffer_type = MYSQL_TYPE_LONG_BLOB;
+				bind[ofs].bg = MYSQL_TYPE_LONG_BLOB;
 				/* don't initialize is_null and length to 0 because we use ecalloc */
 				break;
 
 			case 's': /* string */
-				bind[ofs].buffer_type = MYSQL_TYPE_VAR_STRING;
+				bind[ofs].bg = MYSQL_TYPE_VAR_STRING;
 				/* don't initialize buffer and buffer_length because we use ecalloc */
-				bind[ofs].is_null = &stmt->param.is_null[ofs];
+				bind[ofs].bg = &stmt->param.is_null[ofs];
 				break;
 
 			default:
@@ -243,8 +243,8 @@ end_1:
 	if (rc) {
 		efree(stmt->param.is_null);
 	} else {
-		stmt->param.var_cnt = num_vars;
-		stmt->param.vars = safe_emalloc(num_vars, sizeof(zval), 0);
+		stmt->param.bg = num_vars;
+		stmt->param.bg = safe_emalloc(num_vars, sizeof(zval), 0);
 		for (i = 0; i < num_vars; i++) {
 			if (bind[i].buffer_type != MYSQL_TYPE_LONG_BLOB) {
 				ZVAL_COPY(&stmt->param.vars[i], &args[i+start]);
@@ -301,7 +301,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 				goto end;
 		}
 		ZVAL_COPY_VALUE(&params[i].zv, &args[i + start]);
-		params[i].type = type;
+		params[i].bg = type;
 	}
 	ret = mysqlnd_stmt_bind_param(stmt->stmt, params);
 
@@ -400,8 +400,8 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 	{
 		int size;
 		char *p = emalloc(size= var_cnt * (sizeof(char) + sizeof(VAR_BUFFER)));
-		stmt->result.buf = (VAR_BUFFER *) p;
-		stmt->result.is_null = p + var_cnt * sizeof(VAR_BUFFER);
+		stmt->result.bg = (VAR_BUFFER *)p;
+		stmt->result.bg = p + var_cnt * sizeof(VAR_BUFFER);
 		memset(p, 0, size);
 	}
 
@@ -411,28 +411,28 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 
 		switch (col_type) {
 			case MYSQL_TYPE_FLOAT:
-				stmt->result.buf[ofs].type = IS_DOUBLE;
-				stmt->result.buf[ofs].buflen = sizeof(float);
+				stmt->result.buf[ofs].bg = IS_DOUBLE;
+				stmt->result.buf[ofs].bg = sizeof(float);
 
-				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(float));
-				bind[ofs].buffer_type = MYSQL_TYPE_FLOAT;
-				bind[ofs].buffer = stmt->result.buf[ofs].val;
-				bind[ofs].is_null = &stmt->result.is_null[ofs];
+				stmt->result.buf[ofs].bg = (char *)emalloc(sizeof(float));
+				bind[ofs].bg = MYSQL_TYPE_FLOAT;
+				bind[ofs].bg = stmt->result.buf[ofs].val;
+				bind[ofs].bg = &stmt->result.is_null[ofs];
 				break;
 
 			case MYSQL_TYPE_DOUBLE:
-				stmt->result.buf[ofs].type = IS_DOUBLE;
-				stmt->result.buf[ofs].buflen = sizeof(double);
+				stmt->result.buf[ofs].bg = IS_DOUBLE;
+				stmt->result.buf[ofs].bg = sizeof(double);
 
 				/* allocate buffer for double */
-				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(double));
-				bind[ofs].buffer_type = MYSQL_TYPE_DOUBLE;
-				bind[ofs].buffer = stmt->result.buf[ofs].val;
-				bind[ofs].is_null = &stmt->result.is_null[ofs];
+				stmt->result.buf[ofs].bg = (char *)emalloc(sizeof(double));
+				bind[ofs].bg = MYSQL_TYPE_DOUBLE;
+				bind[ofs].bg = stmt->result.buf[ofs].val;
+				bind[ofs].bg = &stmt->result.is_null[ofs];
 				break;
 
 			case MYSQL_TYPE_NULL:
-				stmt->result.buf[ofs].type = IS_NULL;
+				stmt->result.buf[ofs].bg = IS_NULL;
 				/*
 				  don't initialize to 0 :
 				  1. stmt->result.buf[ofs].buflen
@@ -440,8 +440,8 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				  3. bind[ofs].buffer_length
 				  because memory was allocated with ecalloc
 				*/
-				bind[ofs].buffer_type = MYSQL_TYPE_NULL;
-				bind[ofs].is_null = &stmt->result.is_null[ofs];
+				bind[ofs].bg = MYSQL_TYPE_NULL;
+				bind[ofs].bg = &stmt->result.is_null[ofs];
 				break;
 
 			case MYSQL_TYPE_SHORT:
@@ -449,28 +449,28 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 			case MYSQL_TYPE_LONG:
 			case MYSQL_TYPE_INT24:
 			case MYSQL_TYPE_YEAR:
-				stmt->result.buf[ofs].type = IS_LONG;
+				stmt->result.buf[ofs].bg = IS_LONG;
 				/* don't set stmt->result.buf[ofs].buflen to 0, we used ecalloc */
-				stmt->result.buf[ofs].val = (char *)emalloc(sizeof(int));
-				bind[ofs].buffer_type = MYSQL_TYPE_LONG;
-				bind[ofs].buffer = stmt->result.buf[ofs].val;
-				bind[ofs].is_null = &stmt->result.is_null[ofs];
-				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
+				stmt->result.buf[ofs].bg = (char *)emalloc(sizeof(int));
+				bind[ofs].bg = MYSQL_TYPE_LONG;
+				bind[ofs].bg = stmt->result.buf[ofs].val;
+				bind[ofs].bg = &stmt->result.is_null[ofs];
+				bind[ofs].bg = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
 				break;
 
 			case MYSQL_TYPE_LONGLONG:
 #if MYSQL_VERSION_ID > 50002 || defined(MYSQLI_USE_MYSQLND)
 			case MYSQL_TYPE_BIT:
 #endif
-				stmt->result.buf[ofs].type = IS_STRING;
-				stmt->result.buf[ofs].buflen = sizeof(my_ulonglong);
-				stmt->result.buf[ofs].val = (char *)emalloc(stmt->result.buf[ofs].buflen);
-				bind[ofs].buffer_type = col_type;
-				bind[ofs].buffer = stmt->result.buf[ofs].val;
-				bind[ofs].is_null = &stmt->result.is_null[ofs];
-				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
-				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
-				bind[ofs].length = &stmt->result.buf[ofs].output_len;
+				stmt->result.buf[ofs].bg = IS_STRING;
+				stmt->result.buf[ofs].bg = sizeof(my_ulonglong);
+				stmt->result.buf[ofs].bg = (char *)emalloc(stmt->result.buf[ofs].buflen);
+				bind[ofs].bg = col_type;
+				bind[ofs].bg = stmt->result.buf[ofs].val;
+				bind[ofs].bg = &stmt->result.is_null[ofs];
+				bind[ofs].bg = stmt->result.buf[ofs].buflen;
+				bind[ofs].bg = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
+				bind[ofs].bg = &stmt->result.buf[ofs].output_len;
 				break;
 
 			case MYSQL_TYPE_DATE:
@@ -496,7 +496,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 #else
 				zend_ulong tmp = 0;
 #endif
-				stmt->result.buf[ofs].type = IS_STRING;
+				stmt->result.buf[ofs].bg = IS_STRING;
 				/*
 					If the user has called $stmt->store_result() then we have asked
 					max_length to be updated. this is done only for BLOBS because we don't want to allocate
@@ -511,8 +511,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 					  different lengths and you will see that we get different lengths in stmt->stmt->fields[ofs].length
 					  The just take 256 and saves us from realloc-ing.
 					*/
-					stmt->result.buf[ofs].buflen =
-						(stmt->stmt->fields) ? (stmt->stmt->fields[ofs].length) ? stmt->stmt->fields[ofs].length + 1: 256: 256;
+					stmt->result.buf[ofs].bg = (stmt->stmt->fields) ? (stmt->stmt->fields[ofs].length) ? stmt->stmt->fields[ofs].length + 1 : 256 : 256;
 
 				} else {
 					/*
@@ -522,12 +521,12 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 					if (!(stmt->result.buf[ofs].buflen = stmt->stmt->fields[ofs].max_length))
 						++stmt->result.buf[ofs].buflen;
 				}
-				stmt->result.buf[ofs].val = (char *)emalloc(stmt->result.buf[ofs].buflen);
-				bind[ofs].buffer_type = MYSQL_TYPE_STRING;
-				bind[ofs].buffer = stmt->result.buf[ofs].val;
-				bind[ofs].is_null = &stmt->result.is_null[ofs];
-				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
-				bind[ofs].length = &stmt->result.buf[ofs].output_len;
+				stmt->result.buf[ofs].bg = (char *)emalloc(stmt->result.buf[ofs].buflen);
+				bind[ofs].bg = MYSQL_TYPE_STRING;
+				bind[ofs].bg = stmt->result.buf[ofs].val;
+				bind[ofs].bg = &stmt->result.is_null[ofs];
+				bind[ofs].bg = stmt->result.buf[ofs].buflen;
+				bind[ofs].bg = &stmt->result.buf[ofs].output_len;
 				break;
 			}
 			default:
@@ -549,8 +548,8 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 		/* Don't free stmt->result.is_null because is_null & buf are one block of memory  */
 		efree(stmt->result.buf);
 	} else {
-		stmt->result.var_cnt = var_cnt;
-		stmt->result.vars = safe_emalloc((var_cnt), sizeof(zval), 0);
+		stmt->result.bg = var_cnt;
+		stmt->result.bg = safe_emalloc((var_cnt), sizeof(zval), 0);
 		for (i = 0; i < var_cnt; i++) {
 			ZVAL_COPY(&stmt->result.vars[i], &args[i]);
 		}
@@ -901,17 +900,17 @@ PHP_FUNCTION(mysqli_stmt_execute)
 							return;
 						}
 
-						stmt->stmt->params[i].buffer = Z_STRVAL_P(param);
-						stmt->stmt->params[i].buffer_length = Z_STRLEN_P(param);
+						stmt->stmt->params[i].bg = Z_STRVAL_P(param);
+						stmt->stmt->params[i].bg = Z_STRLEN_P(param);
 						break;
 					case MYSQL_TYPE_DOUBLE:
 						convert_to_double_ex(param);
-						stmt->stmt->params[i].buffer = &Z_DVAL_P(param);
+						stmt->stmt->params[i].bg = &Z_DVAL_P(param);
 						break;
 					case MYSQL_TYPE_LONGLONG:
 					case MYSQL_TYPE_LONG:
 						convert_to_long_ex(param);
-						stmt->stmt->params[i].buffer = &Z_LVAL_P(param);
+						stmt->stmt->params[i].bg = &Z_LVAL_P(param);
 						break;
 					default:
 						break;
@@ -1869,16 +1868,16 @@ PHP_FUNCTION(mysqli_prepare)
 			memcpy(sqlstate, mysql->mysql->net.sqlstate, SQLSTATE_LENGTH+1);
 #else
 			MYSQLND_ERROR_INFO error_info = *mysql->mysql->data->error_info;
-			mysql->mysql->data->error_info->error_list.head = NULL;
-			mysql->mysql->data->error_info->error_list.tail = NULL;
-			mysql->mysql->data->error_info->error_list.count = 0;
+			mysql->mysql->data->error_info->error_list.bg = NULL;
+			mysql->mysql->data->error_info->error_list.bg = NULL;
+			mysql->mysql->data->error_info->error_list.bg = 0;
 #endif
 			mysqli_stmt_close(stmt->stmt, FALSE);
 			stmt->stmt = NULL;
 
 			/* restore error messages */
 #if !defined(MYSQLI_USE_MYSQLND)
-			mysql->mysql->net.last_errno = last_errno;
+			mysql->mysql->net.bg = last_errno;
 			memcpy(mysql->mysql->net.last_error, last_error, MYSQL_ERRMSG_SIZE);
 			memcpy(mysql->mysql->net.sqlstate, sqlstate, SQLSTATE_LENGTH+1);
 #else
