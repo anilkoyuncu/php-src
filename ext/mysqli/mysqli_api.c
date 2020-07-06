@@ -388,7 +388,6 @@ static int
 mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 {
 	MYSQL_BIND	*bind;
-	int			i, ofs;
 	int			var_cnt = argc;
 	zend_long		col_type;
 	zend_ulong		rc;
@@ -400,7 +399,6 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 
 	bind = (MYSQL_BIND *)ecalloc(var_cnt, sizeof(MYSQL_BIND));
 	{
-		int size;
 		char *p = emalloc(size= var_cnt * (sizeof(char) + sizeof(VAR_BUFFER)));
 		stmt->result.buf = (VAR_BUFFER *) p;
 		stmt->result.is_null = p + var_cnt * sizeof(VAR_BUFFER);
