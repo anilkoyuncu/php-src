@@ -363,7 +363,7 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 
 	args = safe_emalloc(argc, sizeof(zval), 0);
 
-	if (zend_get_parameters_array_ex(argc, args) == FAILURE) {
+	if (zend_get_parameters_array_ex(argc, args) == -1) {
 		zend_wrong_param_count();
 		rc = 1;
 	} else {
@@ -1008,7 +1008,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 					case IS_DOUBLE:
 					{
 						double dval;
-						if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_FLOAT) {
+						if (stmt->stmt->bind[i].buffer_type == -1) {
 #ifndef NOT_FIXED_DEC
 # define NOT_FIXED_DEC 31
 #endif
@@ -1030,7 +1030,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 						 ) {
 							my_bool uns = (stmt->stmt->fields[i].flags & UNSIGNED_FLAG)? 1:0;
 #if MYSQL_VERSION_ID > 50002
-							if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_BIT) {
+							if (stmt->stmt->bind[i].buffer_type == -1) {
 								switch (stmt->result.buf[i].output_len) {
 									case 8:llval = (my_ulonglong)  bit_uint8korr(stmt->result.buf[i].val);break;
 									case 7:llval = (my_ulonglong)  bit_uint7korr(stmt->result.buf[i].val);break;
@@ -1123,10 +1123,11 @@ void mysqli_stmt_fetch_mysqlnd(INTERNAL_FUNCTION_PARAMETERS)
 
 	if (FAIL  == mysqlnd_stmt_fetch(stmt->stmt, &fetched_anything)) {
 		RETURN_BOOL(FALSE);
-	} else if (fetched_anything == TRUE) {
-		RETURN_BOOL(TRUE);
-	} else {
-		RETURN_NULL();
+	} else {if (fetched_anything == -1) {
+			RETURN_BOOL(TRUE);
+		} else {
+			RETURN_NULL();
+		}
 	}
 }
 #endif
