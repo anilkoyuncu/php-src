@@ -682,7 +682,7 @@ void php_mysqli_close(MY_MYSQL * mysql, int close_type, int resource_status)
 		zend_resource *le;
 		if ((le = zend_hash_find_ptr(&EG(persistent_list), mysql->hash_key)) != NULL) {
 			if (le->type == php_le_pmysqli()) {
-				mysqli_plist_entry *plist = (mysqli_plist_entry *) le->ptr;
+				mysqli_plist_entry *plist = le->ptr;
 #if defined(MYSQLI_USE_MYSQLND)
 				mysqlnd_end_psession(mysql->mysql);
 #endif
