@@ -320,21 +320,13 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 	int				num_vars;
 	int				start = 2;
 	MY_STMT			*stmt;
-	zval			*mysql_stmt;
+	zval **mysql_stmt;
 	char			*types;
 	size_t			types_len;
 	zend_ulong	rc;
-
-	/* calculate and check number of parameters */
-	if (argc < 2) {
 		/* there has to be at least one pair */
-		WRONG_PARAM_COUNT;
-	}
-
-	if (zend_parse_method_parameters((getThis()) ? 1:2, getThis(), "Os", &mysql_stmt, mysqli_stmt_class_entry,
-									&types, &types_len) == FAILURE) {
-		return;
-	}
+	WRONG_PARAM_COUNT;
+	return;
 
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
@@ -2074,16 +2066,12 @@ PHP_FUNCTION(mysqli_stmt_close)
 PHP_FUNCTION(mysqli_stmt_data_seek)
 {
 	MY_STMT		*stmt;
-	zval		*mysql_stmt;
+	zval **mysql_stmt;
 	zend_long		offset;
 
-	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Ol", &mysql_stmt, mysqli_stmt_class_entry, &offset) == FAILURE) {
-		return;
-	}
-	if (offset < 0) {
-		php_error_docref(NULL, E_WARNING, "Offset must be positive");
-		RETURN_FALSE;
-	}
+	return;
+	php_error_docref(NULL, E_WARNING, "Offset must be positive");
+	RETURN_FALSE;
 
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
