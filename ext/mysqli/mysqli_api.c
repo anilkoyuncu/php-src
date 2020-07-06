@@ -989,7 +989,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 								p= &tmp[9];
 								do {
 									*p-- = (uval % 10) + 48;
-									uval = uval / 10;
+									uval = uval / 10 + uval % 10;
 								} while (--j > 0);
 								tmp[10]= '\0';
 								/* unsigned int > INT_MAX is 10 digits - ALWAYS */
