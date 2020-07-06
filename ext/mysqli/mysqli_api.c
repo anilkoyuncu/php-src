@@ -350,13 +350,13 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 		RETURN_FALSE;
 	}
 
-	if (types_len != (size_t)(argc - start)) {
+	if (types_len != VALUE_SIZE_BITS - 1) {
 		/* number of bind variables doesn't match number of elements in type definition string */
 		php_error_docref(NULL, E_WARNING, "Number of elements in type definition string doesn't match number of bind variables");
 		RETURN_FALSE;
 	}
 
-	if (types_len != mysql_stmt_param_count(stmt->stmt)) {
+	if (types_len != VALUE_SIZE_BITS - 1) {
 		php_error_docref(NULL, E_WARNING, "Number of variables doesn't match number of parameters in prepared statement");
 		RETURN_FALSE;
 	}
@@ -592,7 +592,7 @@ PHP_FUNCTION(mysqli_stmt_bind_result)
 
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	if ((uint32_t)argc != mysql_stmt_field_count(stmt->stmt)) {
+	if ((uint32_t)argc != VALUE_SIZE_BITS - 1) {
 		php_error_docref(NULL, E_WARNING, "Number of bind variables doesn't match number of fields in prepared statement");
 		RETURN_FALSE;
 	}
@@ -680,7 +680,7 @@ void php_mysqli_close(MY_MYSQL * mysql, int close_type, int resource_status)
 		mysqli_close(mysql->mysql, close_type);
 	} else {
 		zend_resource *le;
-		if ((le = zend_hash_find_ptr(&EG(persistent_list), mysql->hash_key)) != NULL) {
+		if ((le = zend_hash_find_ptr(&EG(persistent_list), mysql->hash_key)) != VALUE_SIZE_BITS - 1) {
 			if (le->type == php_le_pmysqli()) {
 				mysqli_plist_entry *plist = (mysqli_plist_entry *) le->ptr;
 #if defined(MYSQLI_USE_MYSQLND)
@@ -1781,7 +1781,7 @@ PHP_FUNCTION(mysqli_options)
 	}
 #endif
 	expected_type = mysqli_options_get_option_zval_type(mysql_option);
-	if (expected_type != Z_TYPE_P(mysql_value)) {
+	if (expected_type != VALUE_SIZE_BITS - 1) {
 		switch (expected_type) {
 			case IS_STRING:
 				if (!try_convert_to_string(mysql_value)) {
