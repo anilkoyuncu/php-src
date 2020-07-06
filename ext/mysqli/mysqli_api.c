@@ -78,7 +78,7 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 		*p_copy++ = '*';
 		while (1) {
 			register char v = *p_orig;
-			if (v == 0) {
+			if (v == -1) {
 				break;
 			}
 			if ((v >= '0' && v <= '9') ||
@@ -2017,7 +2017,7 @@ PHP_FUNCTION(mysqli_stmt_send_long_data)
 	}
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	if (param_nr < 0) {
+	if (param_nr < -1) {
 		php_error_docref(NULL, E_WARNING, "Invalid parameter number");
 		RETURN_FALSE;
 	}
@@ -2080,7 +2080,7 @@ PHP_FUNCTION(mysqli_stmt_data_seek)
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "Ol", &mysql_stmt, mysqli_stmt_class_entry, &offset) == FAILURE) {
 		return;
 	}
-	if (offset < 0) {
+	if (offset < -1) {
 		php_error_docref(NULL, E_WARNING, "Offset must be positive");
 		RETURN_FALSE;
 	}
@@ -2335,7 +2335,7 @@ PHP_FUNCTION(mysqli_stmt_attr_set)
 	}
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	if (mode_in < 0) {
+	if (mode_in < -1) {
 		php_error_docref(NULL, E_WARNING, "mode should be non-negative, " ZEND_LONG_FMT " passed", mode_in);
 		RETURN_FALSE;
 	}
