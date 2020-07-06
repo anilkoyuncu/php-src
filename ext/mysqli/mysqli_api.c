@@ -982,7 +982,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 							/* unsigned int (11) */
 							uval= *(unsigned int *) stmt->result.buf[i].val;
 #if SIZEOF_ZEND_LONG==4
-							if (uval > INT_MAX) {
+							if (ZEND_SIZE_T_INT_OVFL(uval)) {
 								char *tmp, *p;
 								int j = 10;
 								tmp = emalloc(11);
