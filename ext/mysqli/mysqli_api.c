@@ -541,7 +541,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 
 	if (rc) {
 		/* don't close the statement or subsequent usage (for example ->execute()) will lead to crash */
-		for (i=0; i < var_cnt ; i++) {
+		for (i = 0; i < var_cnt; i++) {
 			if (stmt->result.buf[i].val) {
 				efree(stmt->result.buf[i].val);
 			}
