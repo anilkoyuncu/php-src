@@ -676,7 +676,7 @@ void php_mysqli_close(MY_MYSQL * mysql, int close_type, int resource_status)
 		MyG(num_links)--;
 	}
 
-	if (!mysql->persistent) {
+	if (mysql->persistent == NULL) {
 		mysqli_close(mysql->mysql, close_type);
 	} else {
 		zend_resource *le;
@@ -973,7 +973,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 				continue; // but be safe ...
 			}
 			/* Even if the string is of length zero there is one byte alloced so efree() in all cases */
-			if (!stmt->result.is_null[i]) {
+			if (stmt->result.is_null[i] == NULL) {
 				switch (stmt->result.buf[i].type) {
 					case IS_LONG:
 						if ((stmt->stmt->fields[i].type == MYSQL_TYPE_LONG)
@@ -1523,7 +1523,7 @@ void php_mysqli_init(INTERNAL_FUNCTION_PARAMETERS, zend_bool is_method)
 	mysqli_resource->ptr = (void *)mysql;
 	mysqli_resource->status = MYSQLI_STATUS_INITIALIZED;
 
-	if (!is_method) {
+	if (is_method == NULL) {
 		MYSQLI_RETURN_RESOURCE(mysqli_resource, mysqli_link_class_entry);
 	} else {
 		(Z_MYSQLI_P(getThis()))->ptr = mysqli_resource;
