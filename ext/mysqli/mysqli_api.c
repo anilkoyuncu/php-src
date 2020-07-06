@@ -169,7 +169,7 @@ PHP_FUNCTION(mysqli_autocommit)
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
 
 	if (mysql_autocommit(mysql->mysql, (my_bool)automode)) {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	RETURN_TRUE;
 }
@@ -347,18 +347,18 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 	}
 	if (!types_len) {
 		php_error_docref(NULL, E_WARNING, "Invalid type or no types specified");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	if (types_len != (size_t)(argc - start)) {
 		/* number of bind variables doesn't match number of elements in type definition string */
 		php_error_docref(NULL, E_WARNING, "Number of elements in type definition string doesn't match number of bind variables");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	if (types_len != mysql_stmt_param_count(stmt->stmt)) {
 		php_error_docref(NULL, E_WARNING, "Number of variables doesn't match number of parameters in prepared statement");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	args = safe_emalloc(argc, sizeof(zval), 0);
@@ -594,7 +594,7 @@ PHP_FUNCTION(mysqli_stmt_bind_result)
 
 	if ((uint32_t)argc != mysql_stmt_field_count(stmt->stmt)) {
 		php_error_docref(NULL, E_WARNING, "Number of bind variables doesn't match number of fields in prepared statement");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	rc = mysqli_stmt_bind_result_do_bind(stmt, args, argc);
@@ -632,7 +632,7 @@ PHP_FUNCTION(mysqli_change_user)
 	MYSQLI_REPORT_MYSQL_ERROR(mysql->mysql);
 
 	if (rc) {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 #if !defined(MYSQLI_USE_MYSQLND) && defined(HAVE_MYSQLI_SET_CHARSET)
 	if (mysql_get_server_version(mysql->mysql) < 50123L) {
@@ -752,7 +752,7 @@ PHP_FUNCTION(mysqli_commit)
 #else
 	if (FAIL == mysqlnd_commit(mysql->mysql, flags, name)) {
 #endif
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	RETURN_TRUE;
 }
@@ -774,11 +774,11 @@ PHP_FUNCTION(mysqli_data_seek)
 
 	if (mysqli_result_is_unbuffered(result)) {
 		php_error_docref(NULL, E_WARNING, "Function cannot be used with MYSQL_USE_RESULT");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	if (offset < 0 || (uint64_t)offset >= mysql_num_rows(result)) {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	mysql_data_seek(result, offset);
@@ -1100,7 +1100,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 			RETURN_TRUE;
 		break;
 		case 1:
-			RETURN_FALSE;
+			RETVAL_FALSE;
 		break;
 		default:
 			RETURN_NULL();
@@ -1189,7 +1189,7 @@ PHP_FUNCTION(mysqli_fetch_field)
 	MYSQLI_FETCH_RESOURCE(result, MYSQL_RES *, mysql_result, "mysqli_result", MYSQLI_STATUS_VALID);
 
 	if (!(field = mysql_fetch_field(result))) {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	object_init(return_value);
@@ -1244,11 +1244,11 @@ PHP_FUNCTION(mysqli_fetch_field_direct)
 
 	if (offset < 0 || offset >= (zend_long) mysql_num_fields(result)) {
 		php_error_docref(NULL, E_WARNING, "Field offset is invalid for resultset");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	if (!(field = mysql_fetch_field_direct(result,offset))) {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	object_init(return_value);
@@ -1276,7 +1276,7 @@ PHP_FUNCTION(mysqli_fetch_lengths)
 	MYSQLI_FETCH_RESOURCE(result, MYSQL_RES *, mysql_result, "mysqli_result", MYSQLI_STATUS_VALID);
 
 	if (!(ret = mysql_fetch_lengths(result))) {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	array_init(return_value);
@@ -1329,7 +1329,7 @@ PHP_FUNCTION(mysqli_field_seek)
 
 	if (fieldnr < 0 || (uint32_t)fieldnr >= mysql_num_fields(result)) {
 		php_error_docref(NULL, E_WARNING, "Invalid field offset");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	mysql_field_seek(result, fieldnr);
@@ -1516,7 +1516,7 @@ void php_mysqli_init(INTERNAL_FUNCTION_PARAMETERS, zend_bool is_method)
 #endif
 	{
 		efree(mysql);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
@@ -1579,12 +1579,12 @@ PHP_FUNCTION(mysqli_kill)
 
 	if (processid <= 0) {
 		php_error_docref(NULL, E_WARNING, "processid should have positive value");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	if (mysql_kill(mysql->mysql, processid)) {
 		MYSQLI_REPORT_MYSQL_ERROR(mysql->mysql);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	RETURN_TRUE;
 }
@@ -1776,7 +1776,7 @@ PHP_FUNCTION(mysqli_options)
 #if !defined(MYSQLI_USE_MYSQLND)
 	if (PG(open_basedir) && PG(open_basedir)[0] != '\0') {
 		if(mysql_option == MYSQL_OPT_LOCAL_INFILE) {
-			RETURN_FALSE;
+			RETVAL_FALSE;
 		}
 	}
 #endif
@@ -1850,7 +1850,7 @@ PHP_FUNCTION(mysqli_prepare)
 #if !defined(MYSQLI_USE_MYSQLND)
 	if (mysql->mysql->status == MYSQL_STATUS_GET_RESULT) {
 		php_error_docref(NULL, E_WARNING, "All data must be fetched before a new statement prepare takes place");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 #endif
 
@@ -1900,7 +1900,7 @@ PHP_FUNCTION(mysqli_prepare)
 	if (!stmt->stmt) {
 		MYSQLI_REPORT_MYSQL_ERROR(mysql->mysql);
 		efree(stmt);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 #ifndef MYSQLI_USE_MYSQLND
 	ZVAL_COPY(&stmt->link_handle, mysql_link);
@@ -1941,7 +1941,7 @@ PHP_FUNCTION(mysqli_real_query)
 
 	if (mysql_real_query(mysql->mysql, query, query_len)) {
 		MYSQLI_REPORT_MYSQL_ERROR(mysql->mysql);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	if (!mysql_field_count(mysql->mysql)) {
@@ -1996,7 +1996,7 @@ PHP_FUNCTION(mysqli_rollback)
 #else
 	if (FAIL == mysqlnd_rollback(mysql->mysql, flags, name)) {
 #endif
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	RETURN_TRUE;
 }
@@ -2019,10 +2019,10 @@ PHP_FUNCTION(mysqli_stmt_send_long_data)
 
 	if (param_nr < 0) {
 		php_error_docref(NULL, E_WARNING, "Invalid parameter number");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	if (mysql_stmt_send_long_data(stmt->stmt, param_nr, data, data_len)) {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	RETURN_TRUE;
 }
@@ -2082,7 +2082,7 @@ PHP_FUNCTION(mysqli_stmt_data_seek)
 	}
 	if (offset < 0) {
 		php_error_docref(NULL, E_WARNING, "Offset must be positive");
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
@@ -2171,7 +2171,7 @@ PHP_FUNCTION(mysqli_stmt_reset)
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
 	if (mysql_stmt_reset(stmt->stmt)) {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	RETURN_TRUE;
 }
@@ -2212,7 +2212,7 @@ PHP_FUNCTION(mysqli_select_db)
 
 	if (mysql_select_db(mysql->mysql, dbname)) {
 		MYSQLI_REPORT_MYSQL_ERROR(mysql->mysql);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	RETURN_TRUE;
 }
@@ -2290,7 +2290,7 @@ PHP_FUNCTION(mysqli_stat)
 		RETURN_STR(stat);
 #endif
 	} else {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 }
 
@@ -2337,7 +2337,7 @@ PHP_FUNCTION(mysqli_stmt_attr_set)
 
 	if (mode_in < 0) {
 		php_error_docref(NULL, E_WARNING, "mode should be non-negative, " ZEND_LONG_FMT " passed", mode_in);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	switch (attr) {
@@ -2357,7 +2357,7 @@ PHP_FUNCTION(mysqli_stmt_attr_set)
 #else
 	if (FAIL == mysql_stmt_attr_set(stmt->stmt, attr, mode_p)) {
 #endif
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	RETURN_TRUE;
 }
@@ -2379,7 +2379,7 @@ PHP_FUNCTION(mysqli_stmt_attr_get)
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
 	if ((rc = mysql_stmt_attr_get(stmt->stmt, attr, &value))) {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 #if MYSQL_VERSION_ID >= 50107
@@ -2445,7 +2445,7 @@ PHP_FUNCTION(mysqli_stmt_init)
 
 	if (!(stmt->stmt = mysql_stmt_init(mysql->mysql))) {
 		efree(stmt);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 #ifndef MYSQLI_USE_MYSQLND
 	ZVAL_COPY(&stmt->link_handle, mysql_link);
@@ -2475,7 +2475,7 @@ PHP_FUNCTION(mysqli_stmt_prepare)
 
 	if (mysql_stmt_prepare(stmt->stmt, query, query_len)) {
 		MYSQLI_REPORT_STMT_ERROR(stmt->stmt);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	/* change status */
 	MYSQLI_SET_STATUS(mysql_stmt, MYSQLI_STATUS_VALID);
@@ -2499,7 +2499,7 @@ PHP_FUNCTION(mysqli_stmt_result_metadata)
 
 	if (!(result = mysql_stmt_result_metadata(stmt->stmt))){
 		MYSQLI_REPORT_STMT_ERROR(stmt->stmt);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
@@ -2552,7 +2552,7 @@ PHP_FUNCTION(mysqli_stmt_store_result)
 
 	if (mysql_stmt_store_result(stmt->stmt)){
 		MYSQLI_REPORT_STMT_ERROR(stmt->stmt);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	RETURN_TRUE;
 }
@@ -2600,7 +2600,7 @@ PHP_FUNCTION(mysqli_store_result)
 #endif
 	if (!result) {
 		MYSQLI_REPORT_MYSQL_ERROR(mysql->mysql);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 	if (MyG(report_mode) & MYSQLI_REPORT_INDEX) {
 		php_mysqli_report_index("from previous query", mysqli_server_status(mysql->mysql));
@@ -2659,7 +2659,7 @@ PHP_FUNCTION(mysqli_use_result)
 
 	if (!(result = mysql_use_result(mysql->mysql))) {
 		MYSQLI_REPORT_MYSQL_ERROR(mysql->mysql);
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
 
 	if (MyG(report_mode) & MYSQLI_REPORT_INDEX) {
