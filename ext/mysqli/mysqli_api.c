@@ -363,13 +363,10 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 
 	args = safe_emalloc(argc, sizeof(zval), 0);
 
-	if (zend_get_parameters_array_ex(argc, args) == FAILURE) {
-		zend_wrong_param_count();
-		rc = 1;
-	} else {
-		rc = mysqli_stmt_bind_param_do_bind(stmt, argc, num_vars, args, start, types);
-		MYSQLI_REPORT_STMT_ERROR(stmt->stmt);
-	}
+	zend_wrong_param_count();
+	rc = 1;
+	rc = mysqli_stmt_bind_param_do_bind(stmt, argc, num_vars, args, start, types);
+	MYSQLI_REPORT_STMT_ERROR(stmt->stmt);
 
 	efree(args);
 
@@ -1008,16 +1005,13 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 					case IS_DOUBLE:
 					{
 						double dval;
-						if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_FLOAT) {
 #ifndef NOT_FIXED_DEC
 # define NOT_FIXED_DEC 31
 #endif
-							dval = mysql_float_to_double(*(float *)stmt->result.buf[i].val,
-										(stmt->stmt->fields[i].decimals >= NOT_FIXED_DEC) ? -1 :
-										stmt->stmt->fields[i].decimals);
-						} else {
-							dval = *((double *)stmt->result.buf[i].val);
-						}
+						dval = mysql_float_to_double(*(float *)stmt->result.buf[i].val,
+									     (stmt->stmt->fields[i].decimals >= NOT_FIXED_DEC) ? -1 :
+									     stmt->stmt->fields[i].decimals);
+						dval = *((double *)stmt->result.buf[i].val);
 
 						ZEND_TRY_ASSIGN_REF_DOUBLE(result, dval);
 						break;
@@ -1030,22 +1024,18 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 						 ) {
 							my_bool uns = (stmt->stmt->fields[i].flags & UNSIGNED_FLAG)? 1:0;
 #if MYSQL_VERSION_ID > 50002
-							if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_BIT) {
-								switch (stmt->result.buf[i].output_len) {
-									case 8:llval = (my_ulonglong)  bit_uint8korr(stmt->result.buf[i].val);break;
-									case 7:llval = (my_ulonglong)  bit_uint7korr(stmt->result.buf[i].val);break;
-									case 6:llval = (my_ulonglong)  bit_uint6korr(stmt->result.buf[i].val);break;
-									case 5:llval = (my_ulonglong)  bit_uint5korr(stmt->result.buf[i].val);break;
-									case 4:llval = (my_ulonglong)  bit_uint4korr(stmt->result.buf[i].val);break;
-									case 3:llval = (my_ulonglong)  bit_uint3korr(stmt->result.buf[i].val);break;
-									case 2:llval = (my_ulonglong)  bit_uint2korr(stmt->result.buf[i].val);break;
-									case 1:llval = (my_ulonglong)  uint1korr(stmt->result.buf[i].val);break;
-								}
-							} else
-#endif
-							{
-								llval= *(my_ulonglong *) stmt->result.buf[i].val;
+							switch (stmt->result.buf[i].output_len) {
+								case 8:llval = (my_ulonglong)  bit_uint8korr(stmt->result.buf[i].val);break;
+								case 7:llval = (my_ulonglong)  bit_uint7korr(stmt->result.buf[i].val);break;
+								case 6:llval = (my_ulonglong)  bit_uint6korr(stmt->result.buf[i].val);break;
+								case 5:llval = (my_ulonglong)  bit_uint5korr(stmt->result.buf[i].val);break;
+								case 4:llval = (my_ulonglong)  bit_uint4korr(stmt->result.buf[i].val);break;
+								case 3:llval = (my_ulonglong)  bit_uint3korr(stmt->result.buf[i].val);break;
+								case 2:llval = (my_ulonglong)  bit_uint2korr(stmt->result.buf[i].val);break;
+								case 1:llval = (my_ulonglong)  uint1korr(stmt->result.buf[i].val);break;
 							}
+#endif
+							llval= *(my_ulonglong *) stmt->result.buf[i].val;
 #if SIZEOF_ZEND_LONG==8
 							if (uns && llval > 9223372036854775807L) {
 #elif SIZEOF_ZEND_LONG==4
@@ -1123,10 +1113,10 @@ void mysqli_stmt_fetch_mysqlnd(INTERNAL_FUNCTION_PARAMETERS)
 
 	if (FAIL  == mysqlnd_stmt_fetch(stmt->stmt, &fetched_anything)) {
 		RETURN_BOOL(FALSE);
-	} else if (fetched_anything == TRUE) {
-		RETURN_BOOL(TRUE);
 	} else {
+		RETURN_BOOL(TRUE);
 		RETURN_NULL();
+	
 	}
 }
 #endif
