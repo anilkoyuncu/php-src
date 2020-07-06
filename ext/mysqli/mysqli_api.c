@@ -79,7 +79,7 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 		while (1) {
 			register char v = *p_orig;
 			if (v == 0) {
-				break;
+				return;
 			}
 			if ((v >= '0' && v <= '9') ||
 				(v >= 'a' && v <= 'z') ||
@@ -207,7 +207,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 				bind[ofs].buffer_type = MYSQL_TYPE_DOUBLE;
 				bind[ofs].buffer = &Z_DVAL_P(param);
 				bind[ofs].is_null = &stmt->param.is_null[ofs];
-				break;
+				return;
 
 			case 'i': /* Integer */
 #if SIZEOF_ZEND_LONG==8
@@ -217,18 +217,18 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 #endif
 				bind[ofs].buffer = &Z_LVAL_P(param);
 				bind[ofs].is_null = &stmt->param.is_null[ofs];
-				break;
+				return;
 
 			case 'b': /* Blob (send data) */
 				bind[ofs].buffer_type = MYSQL_TYPE_LONG_BLOB;
 				/* don't initialize is_null and length to 0 because we use ecalloc */
-				break;
+				return;
 
 			case 's': /* string */
 				bind[ofs].buffer_type = MYSQL_TYPE_VAR_STRING;
 				/* don't initialize buffer and buffer_length because we use ecalloc */
 				bind[ofs].is_null = &stmt->param.is_null[ofs];
-				break;
+				return;
 
 			default:
 				php_error_docref(NULL, E_WARNING, "Undefined fieldtype %c (parameter %d)", types[ofs], i+1);
@@ -279,20 +279,20 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 		switch (types[i]) {
 			case 'd': /* Double */
 				type = MYSQL_TYPE_DOUBLE;
-				break;
+				return;
 			case 'i': /* Integer */
 #if SIZEOF_ZEND_LONG==8
 				type = MYSQL_TYPE_LONGLONG;
 #elif SIZEOF_ZEND_LONG==4
 				type = MYSQL_TYPE_LONG;
 #endif
-				break;
+				return;
 			case 'b': /* Blob (send data) */
 				type = MYSQL_TYPE_LONG_BLOB;
-				break;
+				return;
 			case 's': /* string */
 				type = MYSQL_TYPE_VAR_STRING;
-				break;
+				return;
 			default:
 				/* We count parameters from 1 */
 				php_error_docref(NULL, E_WARNING, "Undefined fieldtype %c (parameter %d)", types[i], i + start + 1);
@@ -418,7 +418,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].buffer_type = MYSQL_TYPE_FLOAT;
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
-				break;
+				return;
 
 			case MYSQL_TYPE_DOUBLE:
 				stmt->result.buf[ofs].type = IS_DOUBLE;
@@ -429,7 +429,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].buffer_type = MYSQL_TYPE_DOUBLE;
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
-				break;
+				return;
 
 			case MYSQL_TYPE_NULL:
 				stmt->result.buf[ofs].type = IS_NULL;
@@ -442,7 +442,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				*/
 				bind[ofs].buffer_type = MYSQL_TYPE_NULL;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
-				break;
+				return;
 
 			case MYSQL_TYPE_SHORT:
 			case MYSQL_TYPE_TINY:
@@ -456,7 +456,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
-				break;
+				return;
 
 			case MYSQL_TYPE_LONGLONG:
 #if MYSQL_VERSION_ID > 50002 || defined(MYSQLI_USE_MYSQLND)
@@ -471,7 +471,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
 				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
 				bind[ofs].length = &stmt->result.buf[ofs].output_len;
-				break;
+				return;
 
 			case MYSQL_TYPE_DATE:
 			case MYSQL_TYPE_TIME:
@@ -528,11 +528,11 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
 				bind[ofs].length = &stmt->result.buf[ofs].output_len;
-				break;
+				return;
 			}
 			default:
 				php_error_docref(NULL, E_WARNING, "Server returned unknown type %ld. Probably your client library is incompatible with the server version you use!", col_type);
-				break;
+				return;
 		}
 	}
 
@@ -881,7 +881,7 @@ PHP_FUNCTION(mysqli_stmt_execute)
 					/*SEPARATE_ZVAL(&stmt->param.vars[j]);*/
 					Z_DELREF_P(&stmt->param.vars[j]);
 					ZVAL_COPY(&stmt->param.vars[j], Z_REFVAL(stmt->param.vars[j]));
-					break;
+					return;
 				}
 			}
 		}
@@ -903,18 +903,18 @@ PHP_FUNCTION(mysqli_stmt_execute)
 
 						stmt->stmt->params[i].buffer = Z_STRVAL_P(param);
 						stmt->stmt->params[i].buffer_length = Z_STRLEN_P(param);
-						break;
+						return;
 					case MYSQL_TYPE_DOUBLE:
 						convert_to_double_ex(param);
 						stmt->stmt->params[i].buffer = &Z_DVAL_P(param);
-						break;
+						return;
 					case MYSQL_TYPE_LONGLONG:
 					case MYSQL_TYPE_LONG:
 						convert_to_long_ex(param);
 						stmt->stmt->params[i].buffer = &Z_LVAL_P(param);
-						break;
+						return;
 					default:
-						break;
+						return;
 				}
 			}
 		}
@@ -995,7 +995,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 								/* unsigned int > INT_MAX is 10 digits - ALWAYS */
 								ZEND_TRY_ASSIGN_REF_STRINGL(result, tmp, 10);
 								efree(tmp);
-								break;
+								return;
 							}
 #endif
 						}
@@ -1004,7 +1004,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 						} else {
 							ZEND_TRY_ASSIGN_REF_LONG(result, *(int *)stmt->result.buf[i].val);
 						}
-						break;
+						return;
 					case IS_DOUBLE:
 					{
 						double dval;
@@ -1020,7 +1020,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 						}
 
 						ZEND_TRY_ASSIGN_REF_DOUBLE(result, dval);
-						break;
+						return;
 					}
 					case IS_STRING:
 						if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_LONGLONG
@@ -1032,14 +1032,14 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 #if MYSQL_VERSION_ID > 50002
 							if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_BIT) {
 								switch (stmt->result.buf[i].output_len) {
-									case 8:llval = (my_ulonglong)  bit_uint8korr(stmt->result.buf[i].val);break;
-									case 7:llval = (my_ulonglong)  bit_uint7korr(stmt->result.buf[i].val);break;
-									case 6:llval = (my_ulonglong)  bit_uint6korr(stmt->result.buf[i].val);break;
-									case 5:llval = (my_ulonglong)  bit_uint5korr(stmt->result.buf[i].val);break;
-									case 4:llval = (my_ulonglong)  bit_uint4korr(stmt->result.buf[i].val);break;
-									case 3:llval = (my_ulonglong)  bit_uint3korr(stmt->result.buf[i].val);break;
-									case 2:llval = (my_ulonglong)  bit_uint2korr(stmt->result.buf[i].val);break;
-									case 1:llval = (my_ulonglong)  uint1korr(stmt->result.buf[i].val);break;
+									case 8:llval = (my_ulonglong)  bit_uint8korr(stmt->result.buf[i].val);return;
+									case 7:llval = (my_ulonglong)  bit_uint7korr(stmt->result.buf[i].val);return;
+									case 6:llval = (my_ulonglong)  bit_uint6korr(stmt->result.buf[i].val);return;
+									case 5:llval = (my_ulonglong)  bit_uint5korr(stmt->result.buf[i].val);return;
+									case 4:llval = (my_ulonglong)  bit_uint4korr(stmt->result.buf[i].val);return;
+									case 3:llval = (my_ulonglong)  bit_uint3korr(stmt->result.buf[i].val);return;
+									case 2:llval = (my_ulonglong)  bit_uint2korr(stmt->result.buf[i].val);return;
+									case 1:llval = (my_ulonglong)  uint1korr(stmt->result.buf[i].val);return;
 								}
 							} else
 #endif
@@ -1076,9 +1076,9 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 								ZEND_TRY_ASSIGN_REF_STRINGL(result, stmt->result.buf[i].val, stmt->result.buf[i].output_len);
 							}
 						}
-						break;
+						return;
 					default:
-						break;
+						return;
 				}
 			} else {
 				ZEND_TRY_ASSIGN_REF_NULL(result);
@@ -1098,13 +1098,13 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 		case MYSQL_DATA_TRUNCATED:
 #endif
 			RETURN_TRUE;
-		break;
+		return;
 		case 1:
 			RETURN_FALSE;
-		break;
+		return;
 		default:
 			RETURN_NULL();
-		break;
+		return;
 	}
 }
 /* }}} */
@@ -1787,25 +1787,25 @@ PHP_FUNCTION(mysqli_options)
 				if (!try_convert_to_string(mysql_value)) {
 					return;
 				}
-				break;
+				return;
 			case IS_LONG:
 				convert_to_long_ex(mysql_value);
-				break;
+				return;
 			default:
-				break;
+				return;
 		}
 	}
 	switch (expected_type) {
 		case IS_STRING:
 			ret = mysql_options(mysql->mysql, mysql_option, Z_STRVAL_P(mysql_value));
-			break;
+			return;
 		case IS_LONG:
 			l_value = Z_LVAL_P(mysql_value);
 			ret = mysql_options(mysql->mysql, mysql_option, (char *)&l_value);
-			break;
+			return;
 		default:
 			ret = 1;
-			break;
+			return;
 	}
 
 	RETURN_BOOL(!ret);
@@ -2345,12 +2345,12 @@ PHP_FUNCTION(mysqli_stmt_attr_set)
 	case STMT_ATTR_UPDATE_MAX_LENGTH:
 		mode_b = (my_bool) mode_in;
 		mode_p = &mode_b;
-		break;
+		return;
 #endif
 	default:
 		mode = mode_in;
 		mode_p = &mode;
-		break;
+		return;
 	}
 #if !defined(MYSQLI_USE_MYSQLND)
 	if (mysql_stmt_attr_set(stmt->stmt, attr, mode_p)) {
@@ -2544,7 +2544,7 @@ PHP_FUNCTION(mysqli_stmt_store_result)
 				uint32_t tmp=1;
 #endif
 				mysql_stmt_attr_set(stmt->stmt, STMT_ATTR_UPDATE_MAX_LENGTH, &tmp);
-				break;
+				return;
 			}
 		}
 	}
