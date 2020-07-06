@@ -81,13 +81,7 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 			if (v == 0) {
 				break;
 			}
-			if ((v >= '0' && v <= '9') ||
-				(v >= 'a' && v <= 'z') ||
-				(v >= 'A' && v <= 'Z') ||
-				v == '-' ||
-				v == '_' ||
-				v == ' ' ||
-				v == '=')
+			if ((v >= '0' && v <= '9') || (v >= 'a' && v <= 'z') || (v >= 'A' && v <= 'Z') || v == '-' || v == '_' || v == ' ')
 			{
 				*p_copy++ = v;
 			} else if (warned == FALSE) {
@@ -960,7 +954,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 	}
 	ret = mysql_stmt_fetch(stmt->stmt);
 #ifdef MYSQL_DATA_TRUNCATED
-	if (!ret || ret == MYSQL_DATA_TRUNCATED) {
+	if (!ret) {
 #else
 	if (!ret) {
 #endif
@@ -1024,10 +1018,9 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 					}
 					case IS_STRING:
 						if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_LONGLONG
+
 #if MYSQL_VERSION_ID > 50002
-						 || stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_BIT
-#endif
-						 ) {
+) {
 							my_bool uns = (stmt->stmt->fields[i].flags & UNSIGNED_FLAG)? 1:0;
 #if MYSQL_VERSION_ID > 50002
 							if (stmt->stmt->bind[i].buffer_type == MYSQL_TYPE_BIT) {
