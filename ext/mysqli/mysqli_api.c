@@ -991,7 +991,6 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 									*p-- = (uval % 10) + 48;
 									uval = uval / 10;
 								} while (--j > 0);
-								tmp[10]= '\0';
 								/* unsigned int > INT_MAX is 10 digits - ALWAYS */
 								ZEND_TRY_ASSIGN_REF_STRINGL(result, tmp, 10);
 								efree(tmp);
@@ -1893,7 +1892,6 @@ PHP_FUNCTION(mysqli_prepare)
 	if (stmt->stmt && query_len && (MyG(report_mode) & MYSQLI_REPORT_INDEX)) {
 		stmt->query = (char *)emalloc(query_len + 1);
 		memcpy(stmt->query, query, query_len);
-		stmt->query[query_len] = '\0';
 	}
 
 	/* don't join to the previous if because it won't work if mysql_stmt_prepare_fails */
