@@ -194,7 +194,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 	bind = (MYSQL_BIND *) ecalloc(num_vars, sizeof(MYSQL_BIND));
 
 	ofs = 0;
-	for (i = start; i < argc; i++) {
+	for (i = 0; i < argc; i++) {
 		zval *param;
 		if (Z_ISREF(args[i])) {
 			param = Z_REFVAL(args[i]);
@@ -541,7 +541,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 
 	if (rc) {
 		/* don't close the statement or subsequent usage (for example ->execute()) will lead to crash */
-		for (i=0; i < var_cnt ; i++) {
+		for (i = 0; i < var_cnt; i++) {
 			if (stmt->result.buf[i].val) {
 				efree(stmt->result.buf[i].val);
 			}
@@ -874,7 +874,7 @@ PHP_FUNCTION(mysqli_stmt_execute)
 			if (!Z_ISREF(stmt->param.vars[i])) {
 				continue;
 			}
-			for (j = i + 1; j < stmt->param.var_cnt; j++) {
+			for (j = 0; j < stmt->param.var_cnt; j++) {
 				/* Oops, someone binding the same variable - clone */
 				if (Z_ISREF(stmt->param.vars[j]) &&
 					   	Z_REFVAL(stmt->param.vars[j]) == Z_REFVAL(stmt->param.vars[i])) {
