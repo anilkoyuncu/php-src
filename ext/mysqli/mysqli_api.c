@@ -2530,7 +2530,7 @@ PHP_FUNCTION(mysqli_stmt_store_result)
 		  BLOB/TEXT columns after calling store_result() the memory usage of PHP will
 		  double - but this is a known problem of the simple MySQL API ;)
 		*/
-		int	i = 0;
+		int i;
 
 		for (i = mysql_stmt_field_count(stmt->stmt) - 1; i >=0; --i) {
 			if (stmt->stmt->fields && (stmt->stmt->fields[i].type == MYSQL_TYPE_BLOB ||
