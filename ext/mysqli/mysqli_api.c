@@ -1054,7 +1054,7 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 								(L64(-2147483648) > (my_longlong) llval))))
 							{
 #endif
-								char tmp[22];
+								char tmp[22] = "";
 								/* even though lval is declared as unsigned, the value
 								 * may be negative. Therefor we cannot use MYSQLI_LLU_SPEC and must
 								 * use MYSQLI_LL_SPEC.
@@ -1860,8 +1860,8 @@ PHP_FUNCTION(mysqli_prepare)
 		if (mysql_stmt_prepare(stmt->stmt, query, query_len)) {
 			/* mysql_stmt_close() clears errors, so we have to store them temporarily */
 #if !defined(MYSQLI_USE_MYSQLND)
-			char  last_error[MYSQL_ERRMSG_SIZE];
-			char  sqlstate[SQLSTATE_LENGTH+1];
+			char last_error[MYSQL_ERRMSG_SIZE] = "";
+			char sqlstate[SQLSTATE_LENGTH + 1] = "";
 			unsigned int last_errno;
 
 			last_errno = stmt->stmt->last_errno;
