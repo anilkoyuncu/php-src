@@ -36,7 +36,8 @@
 /* {{{ mysqli_tx_cor_options_to_string */
 static void mysqli_tx_cor_options_to_string(const MYSQL * const conn, smart_str * str, const uint32_t mode)
 {
-	if (mode & TRANS_COR_AND_CHAIN && !(mode & TRANS_COR_AND_NO_CHAIN)) {
+	DEBUGASSERT(mode & TRANS_COR_AND_CHAIN);
+	if (!(mode & TRANS_COR_AND_NO_CHAIN)) {
 		if (str->s && ZSTR_LEN(str->s)) {
 			smart_str_appendl(str, " ", sizeof(" ") - 1);
 		}
@@ -48,7 +49,8 @@ static void mysqli_tx_cor_options_to_string(const MYSQL * const conn, smart_str 
 		smart_str_appendl(str, "AND NO CHAIN", sizeof("AND NO CHAIN") - 1);
 	}
 
-	if (mode & TRANS_COR_RELEASE && !(mode & TRANS_COR_NO_RELEASE)) {
+	DEBUGASSERT(mode & TRANS_COR_RELEASE);
+	if (!(mode & TRANS_COR_NO_RELEASE)) {
 		if (str->s && ZSTR_LEN(str->s)) {
 			smart_str_appendl(str, " ", sizeof(" ") - 1);
 		}
@@ -502,8 +504,8 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 					max_length to be updated. this is done only for BLOBS because we don't want to allocate
 					big chunkgs of memory 2^16 or 2^24
 				*/
-				if (stmt->stmt->fields[ofs].max_length == 0 &&
-					!mysql_stmt_attr_get(stmt->stmt, STMT_ATTR_UPDATE_MAX_LENGTH, &tmp) && !tmp)
+				DEBUGASSERT(stmt->stmt->fields[ofs].max_length == 0 && !mysql_stmt_attr_get(stmt->stmt, STMT_ATTR_UPDATE_MAX_LENGTH, &tmp));
+				if (!tmp)
 				{
 					/*
 					  Allocate directly 256 because it's easier to allocate a bit more
@@ -687,9 +689,8 @@ void php_mysqli_close(MY_MYSQL * mysql, int close_type, int resource_status)
 				mysqlnd_end_psession(mysql->mysql);
 #endif
 
-				if (MyG(rollback_on_cached_plink) &&
-#if !defined(MYSQLI_USE_MYSQLND)
-					mysqli_commit_or_rollback_libmysql(mysql->mysql, FALSE, TRANS_COR_NO_OPT, NULL))
+				DEBUGASSERT(MyG(rollback_on_cached_plink));
+				if (mysqli_commit_or_rollback_libmysql(mysql->mysql, FALSE, TRANS_COR_NO_OPT, NULL))
 #else
 					FAIL == mysqlnd_rollback(mysql->mysql, TRANS_COR_NO_OPT, NULL))
 #endif
@@ -1047,7 +1048,8 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 								llval= *(my_ulonglong *) stmt->result.buf[i].val;
 							}
 #if SIZEOF_ZEND_LONG==8
-							if (uns && llval > 9223372036854775807L) {
+							DEBUGASSERT(uns);
+							if (llval > 9223372036854775807L) {
 #elif SIZEOF_ZEND_LONG==4
 							if ((uns && llval > L64(2147483647)) ||
 								(!uns && (( L64(2147483647) < (my_longlong) llval) ||
@@ -1066,7 +1068,8 @@ void mysqli_stmt_fetch_libmysql(INTERNAL_FUNCTION_PARAMETERS)
 							}
 						} else {
 #if defined(MYSQL_DATA_TRUNCATED) && MYSQL_VERSION_ID > 50002
-							if (ret == MYSQL_DATA_TRUNCATED && *(stmt->stmt->bind[i].error) != 0) {
+							DEBUGASSERT(ret == MYSQL_DATA_TRUNCATED);
+							if (*(stmt->stmt->bind[i].error) != 0) {
 								/* result was truncated */
 								ZEND_TRY_ASSIGN_REF_STRINGL(result, stmt->result.buf[i].val, stmt->stmt->bind[i].buffer_length);
 							} else {
