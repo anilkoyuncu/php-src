@@ -470,7 +470,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
 				bind[ofs].is_unsigned = (stmt->stmt->fields[ofs].flags & UNSIGNED_FLAG) ? 1 : 0;
-				bind[ofs].length = &stmt->result.buf[ofs].output_len;
+				*bind[ofs].length = stmt->result.buf->output_len;
 				break;
 
 			case MYSQL_TYPE_DATE:
@@ -527,7 +527,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				bind[ofs].buffer = stmt->result.buf[ofs].val;
 				bind[ofs].is_null = &stmt->result.is_null[ofs];
 				bind[ofs].buffer_length = stmt->result.buf[ofs].buflen;
-				bind[ofs].length = &stmt->result.buf[ofs].output_len;
+				*bind[ofs].length = stmt->result.buf->output_len;
 				break;
 			}
 			default:
