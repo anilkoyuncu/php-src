@@ -272,7 +272,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 	}
 	params = mysqlnd_stmt_alloc_param_bind(stmt->stmt);
 	if (!params) {
-		goto end;
+		return 0;
 	}
 	for (i = 0; i < (argc - start); i++) {
 		zend_uchar type;
@@ -298,7 +298,7 @@ int mysqli_stmt_bind_param_do_bind(MY_STMT *stmt, unsigned int argc, unsigned in
 				php_error_docref(NULL, E_WARNING, "Undefined fieldtype %c (parameter %d)", types[i], i + start + 1);
 				ret = FAIL;
 				mysqlnd_stmt_free_param_bind(stmt->stmt, params);
-				goto end;
+				return 0;
 		}
 		ZVAL_COPY_VALUE(&params[i].zv, &args[i + start]);
 		params[i].type = type;
