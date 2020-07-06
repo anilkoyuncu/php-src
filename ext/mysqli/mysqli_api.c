@@ -328,7 +328,7 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 	/* calculate and check number of parameters */
 	if (argc < 2) {
 		/* there has to be at least one pair */
-		WRONG_PARAM_COUNT;
+		return;
 	}
 
 	if (zend_parse_method_parameters((getThis()) ? 1:2, getThis(), "Os", &mysql_stmt, mysqli_stmt_class_entry,
