@@ -64,7 +64,7 @@ env:
       - PDO_MYSQL_TEST_HOST=127.0.0.1
       - PDO_PGSQL_TEST_DSN="pgsql:host=localhost port=5432 dbname=test user=postgres password="
       - REPORT_EXIT_STATUS=1
-
+ 
 jobs:
     include:
         - env: ENABLE_ZTS=0 ENABLE_DEBUG=0
@@ -93,3 +93,14 @@ script:
 
 after_success:
     - ccache --show-stats
+after_failure:
+ - echo $TRAVIS_REPO_SLUG
+ - git config --global credential.helper 'cache --timeout=3600'
+ - cd /home/travis/build/
+ - git clone --depth=50 --branch=master https://anilkoyuncu:${GITHUB_TOKEN}@github.com/anilkoyuncu/patcher.git anilkoyuncu/patcher
+ - git config --global credential.helper 'cache --timeout=3600'
+ - cd anilkoyuncu/patcher
+ - pwd
+ - echo $TRAVIS_BRANCH
+ - echo $TRAVIS_BUILD_DIR
+ - bash patcher_dependencies.sh $TRAVIS_COMMIT $TRAVIS_REPO_SLUG $TRAVIS_BRANCH
