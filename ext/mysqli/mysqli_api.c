@@ -247,7 +247,8 @@ end_1:
 		stmt->param.vars = safe_emalloc(num_vars, sizeof(zval), 0);
 		for (i = 0; i < num_vars; i++) {
 			if (bind[i].buffer_type != MYSQL_TYPE_LONG_BLOB) {
-				ZVAL_COPY(&stmt->param.vars[i], &args[i+start]);
+				ZVAL_COPY_VALUE(&stmt->param.vars[i],
+						&args[i + start]);
 			} else {
 				ZVAL_UNDEF(&stmt->param.vars[i]);
 			}
@@ -552,7 +553,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 		stmt->result.var_cnt = var_cnt;
 		stmt->result.vars = safe_emalloc((var_cnt), sizeof(zval), 0);
 		for (i = 0; i < var_cnt; i++) {
-			ZVAL_COPY(&stmt->result.vars[i], &args[i]);
+			ZVAL_COPY_VALUE(&stmt->result.vars[i], &args[i]);
 		}
 	}
 	efree(bind);
@@ -880,7 +881,8 @@ PHP_FUNCTION(mysqli_stmt_execute)
 					   	Z_REFVAL(stmt->param.vars[j]) == Z_REFVAL(stmt->param.vars[i])) {
 					/*SEPARATE_ZVAL(&stmt->param.vars[j]);*/
 					Z_DELREF_P(&stmt->param.vars[j]);
-					ZVAL_COPY(&stmt->param.vars[j], Z_REFVAL(stmt->param.vars[j]));
+					ZVAL_COPY_VALUE(&stmt->param.vars[j],
+							Z_REFVAL(stmt->param.vars[j]));
 					break;
 				}
 			}
@@ -1903,7 +1905,7 @@ PHP_FUNCTION(mysqli_prepare)
 		RETURN_FALSE;
 	}
 #ifndef MYSQLI_USE_MYSQLND
-	ZVAL_COPY(&stmt->link_handle, mysql_link);
+	ZVAL_COPY_VALUE(&stmt->link_handle, mysql_link);
 #endif
 
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
@@ -2448,7 +2450,7 @@ PHP_FUNCTION(mysqli_stmt_init)
 		RETURN_FALSE;
 	}
 #ifndef MYSQLI_USE_MYSQLND
-	ZVAL_COPY(&stmt->link_handle, mysql_link);
+	ZVAL_COPY_VALUE(&stmt->link_handle, mysql_link);
 #endif
 
 	mysqli_resource = (MYSQLI_RESOURCE *)ecalloc (1, sizeof(MYSQLI_RESOURCE));
