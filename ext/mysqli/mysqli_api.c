@@ -2344,12 +2344,12 @@ PHP_FUNCTION(mysqli_stmt_attr_set)
 #if MYSQL_VERSION_ID >= 50107
 	case STMT_ATTR_UPDATE_MAX_LENGTH:
 		mode_b = (my_bool) mode_in;
-		mode_p = &mode_b;
+		src = &mode_b;
 		break;
 #endif
 	default:
 		mode = mode_in;
-		mode_p = &mode;
+		src = &mode;
 		break;
 	}
 #if !defined(MYSQLI_USE_MYSQLND)
