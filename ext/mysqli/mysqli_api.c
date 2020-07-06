@@ -70,7 +70,6 @@ mysqli_escape_string_for_tx_name_in_comment(const char * const name)
 	char * ret = NULL;
 	if (name) {
 		zend_bool warned = FALSE;
-		const char * p_orig = name;
 		char * p_copy;
 		p_copy = ret = emalloc(strlen(name) + 1 + 2 + 2 + 1); /* space, open, close, NullS */
 		*p_copy++ = ' ';
@@ -1379,8 +1378,6 @@ PHP_FUNCTION(mysqli_get_client_info)
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O", &mysql_link, mysqli_link_class_entry) == FAILURE) {
 		return;
 	}
-
-	const char * info = mysql_get_client_info();
 	if (info) {
 		RETURN_STRING(info);
 	}
