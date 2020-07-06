@@ -519,7 +519,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 						the user has called store_result(). if he does not there is no way to determine the
 						libmysql does not allow us to allocate 0 bytes for a buffer so we try 1
 					*/
-					if (!(stmt->result.buf[ofs].buflen = stmt->stmt->fields[ofs].max_length))
+					if (!stmt->stmt->fields[ofs].max_length)
 						++stmt->result.buf[ofs].buflen;
 				}
 				stmt->result.buf[ofs].val = (char *)emalloc(stmt->result.buf[ofs].buflen);
@@ -894,7 +894,7 @@ PHP_FUNCTION(mysqli_stmt_execute)
 			} else {
 				param = &stmt->param.vars[i];
 			}
-			if (!(stmt->param.is_null[i] = (Z_ISNULL_P(param)))) {
+			if (!(Z_ISNULL_P(param))) {
 				switch (stmt->stmt->params[i].buffer_type) {
 					case MYSQL_TYPE_VAR_STRING:
 						if (!try_convert_to_string(param)) {
@@ -1188,7 +1188,7 @@ PHP_FUNCTION(mysqli_fetch_field)
 
 	MYSQLI_FETCH_RESOURCE(result, MYSQL_RES *, mysql_result, "mysqli_result", MYSQLI_STATUS_VALID);
 
-	if (!(field = mysql_fetch_field(result))) {
+	if (!mysql_fetch_field(result)) {
 		RETURN_FALSE;
 	}
 
@@ -1247,7 +1247,7 @@ PHP_FUNCTION(mysqli_fetch_field_direct)
 		RETURN_FALSE;
 	}
 
-	if (!(field = mysql_fetch_field_direct(result,offset))) {
+	if (!mysql_fetch_field_direct(result, offset)) {
 		RETURN_FALSE;
 	}
 
@@ -1275,7 +1275,7 @@ PHP_FUNCTION(mysqli_fetch_lengths)
 
 	MYSQLI_FETCH_RESOURCE(result, MYSQL_RES *, mysql_result, "mysqli_result", MYSQLI_STATUS_VALID);
 
-	if (!(ret = mysql_fetch_lengths(result))) {
+	if (!mysql_fetch_lengths(result)) {
 		RETURN_FALSE;
 	}
 
@@ -1506,7 +1506,7 @@ void php_mysqli_init(INTERNAL_FUNCTION_PARAMETERS, zend_bool is_method)
 	mysql = (MY_MYSQL *)ecalloc(1, sizeof(MY_MYSQL));
 
 #if !defined(MYSQLI_USE_MYSQLND)
-	if (!(mysql->mysql = mysql_init(NULL)))
+	if (!mysql_init(NULL))
 #else
 	/*
 	  We create always persistent, as if the user want to connecto
@@ -2443,7 +2443,7 @@ PHP_FUNCTION(mysqli_stmt_init)
 
 	stmt = (MY_STMT *)ecalloc(1,sizeof(MY_STMT));
 
-	if (!(stmt->stmt = mysql_stmt_init(mysql->mysql))) {
+	if (!mysql_stmt_init(mysql->mysql)) {
 		efree(stmt);
 		RETURN_FALSE;
 	}
@@ -2497,7 +2497,7 @@ PHP_FUNCTION(mysqli_stmt_result_metadata)
 	}
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	if (!(result = mysql_stmt_result_metadata(stmt->stmt))){
+	if (!mysql_stmt_result_metadata(stmt->stmt)){
 		MYSQLI_REPORT_STMT_ERROR(stmt->stmt);
 		RETURN_FALSE;
 	}
@@ -2657,7 +2657,7 @@ PHP_FUNCTION(mysqli_use_result)
 	}
 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
 
-	if (!(result = mysql_use_result(mysql->mysql))) {
+	if (!mysql_use_result(mysql->mysql)) {
 		MYSQLI_REPORT_MYSQL_ERROR(mysql->mysql);
 		RETURN_FALSE;
 	}
