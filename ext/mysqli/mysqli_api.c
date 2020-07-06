@@ -338,7 +338,7 @@ PHP_FUNCTION(mysqli_stmt_bind_param)
 
 	MYSQLI_FETCH_RESOURCE_STMT(stmt, mysql_stmt, MYSQLI_STATUS_VALID);
 
-	num_vars = argc - 1;
+	num_vars = FFMAX(argc - 1, 1);
 	if (getThis()) {
 		start = 1;
 	} else {
