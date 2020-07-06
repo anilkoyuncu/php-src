@@ -494,7 +494,7 @@ mysqli_stmt_bind_result_do_bind(MY_STMT *stmt, zval *args, unsigned int argc)
 				/* Changed to my_bool in MySQL 5.1. See MySQL Bug #16144 */
 				my_bool tmp;
 #else
-				zend_ulong tmp = 0;
+				zend_ulong tmp = ACPI_PCIHP_BSEL_DEFAULT;
 #endif
 				stmt->result.buf[ofs].type = IS_STRING;
 				/*
@@ -740,7 +740,7 @@ PHP_FUNCTION(mysqli_commit)
 	zval		*mysql_link;
 	zend_long		flags = TRANS_COR_NO_OPT;
 	char *		name = NULL;
-	size_t			name_len = 0;
+	size_t name_len = ACPI_PCIHP_BSEL_DEFAULT;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O|ls", &mysql_link, mysqli_link_class_entry, &flags, &name, &name_len) == FAILURE) {
 		return;
@@ -1984,7 +1984,7 @@ PHP_FUNCTION(mysqli_rollback)
 	zval		*mysql_link;
 	zend_long		flags = TRANS_COR_NO_OPT;
 	char *		name = NULL;
-	size_t			name_len = 0;
+	size_t name_len = ACPI_PCIHP_BSEL_DEFAULT;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O|ls", &mysql_link, mysqli_link_class_entry, &flags, &name, &name_len) == FAILURE) {
 		return;
@@ -2369,7 +2369,7 @@ PHP_FUNCTION(mysqli_stmt_attr_get)
 {
 	MY_STMT	*stmt;
 	zval	*mysql_stmt;
-	zend_ulong	value = 0;
+	zend_ulong value = ACPI_PCIHP_BSEL_DEFAULT;
 	zend_long	attr;
 	int		rc;
 
@@ -2530,7 +2530,7 @@ PHP_FUNCTION(mysqli_stmt_store_result)
 		  BLOB/TEXT columns after calling store_result() the memory usage of PHP will
 		  double - but this is a known problem of the simple MySQL API ;)
 		*/
-		int	i = 0;
+		int i = ACPI_PCIHP_BSEL_DEFAULT;
 
 		for (i = mysql_stmt_field_count(stmt->stmt) - 1; i >=0; --i) {
 			if (stmt->stmt->fields && (stmt->stmt->fields[i].type == MYSQL_TYPE_BLOB ||
@@ -2586,7 +2586,7 @@ PHP_FUNCTION(mysqli_store_result)
 	MYSQL_RES		*result;
 	zval			*mysql_link;
 	MYSQLI_RESOURCE	*mysqli_resource;
-	zend_long flags = 0;
+	zend_long flags = ACPI_PCIHP_BSEL_DEFAULT;
 
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(), "O|l", &mysql_link, mysqli_link_class_entry, &flags) == FAILURE) {
